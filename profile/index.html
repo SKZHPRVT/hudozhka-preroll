@@ -6,7 +6,7 @@
     <meta name="telegram-web-app-capable" content="yes">
     <title>Профиль — Рисовашка</title>
     <style>
-        :root { --pink: #FF6B9D; --purple: #9B59B6; --bg: #FFF5F8; --text: #2C3E50; --hint: #999999; }
+        :root { --pink: #FF6B9D; --purple: #9B59B6; --green: #4CAF50; --bg: #FFF5F8; --text: #2C3E50; --hint: #999999; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { font-family: -apple-system, sans-serif; background: var(--bg); max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; color: var(--text); }
         
@@ -17,10 +17,20 @@
             text-align: center;
             border-radius: 0 0 30px 30px;
             margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 48px; margin: 0 auto 14px; }
-        .user-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-        .user-archetype { font-size: 14px; opacity: 0.9; }
+        .profile-header::before {
+            content: '🎨';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            font-size: 180px;
+            opacity: 0.12;
+        }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 48px; margin: 0 auto 14px; position: relative; z-index: 1; }
+        .user-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; position: relative; z-index: 1; }
+        .user-archetype { font-size: 14px; opacity: 0.9; position: relative; z-index: 1; }
         
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-bottom: 20px; }
         .stat { background: white; border-radius: 16px; padding: 16px 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
@@ -30,16 +40,157 @@
         .section { padding: 0 20px; margin-bottom: 20px; }
         .section-title { font-size: 17px; font-weight: 800; margin-bottom: 12px; }
         
-        .menu-item { background: white; border-radius: 14px; padding: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); cursor: pointer; text-decoration: none; color: inherit; }
+        .menu-item { background: white; border-radius: 14px; padding: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); cursor: pointer; text-decoration: none; color: inherit; transition: transform 0.15s; }
+        .menu-item:active { transform: scale(0.98); }
         .menu-icon { font-size: 24px; }
         .menu-text { flex: 1; font-size: 14px; font-weight: 600; }
         .menu-arrow { color: var(--hint); }
         
+        /* Рисунки */
         .drawings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-        .drawing-thumb { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        .drawing-thumb img { width: 100%; height: 100px; object-fit: cover; display: block; }
+        .drawing-thumb { 
+            background: white; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06); 
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .drawing-thumb:active { transform: scale(0.96); }
+        .drawing-thumb img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+        .drawing-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        .drawing-badge.graded {
+            background: var(--green);
+        }
+        .drawing-badge.submitted {
+            background: #2196F3;
+        }
+        .drawing-date {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            color: white;
+            padding: 12px 6px 4px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        
         .empty-state { text-align: center; padding: 40px 20px; color: var(--hint); }
         .empty-emoji { font-size: 60px; margin-bottom: 12px; }
+        
+        /* Модалка просмотра */
+        .viewer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 300;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .viewer.open { display: flex; }
+        .viewer-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            margin-bottom: 16px;
+        }
+        .viewer-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .viewer-title { font-size: 16px; font-weight: 700; }
+        .viewer-canvas-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .viewer-canvas-wrap img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 16px;
+            background: white;
+        }
+        .viewer-bottom {
+            margin-top: 16px;
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+        }
+        .viewer-info { font-size: 13px; color: var(--hint); margin-bottom: 12px; }
+        .viewer-grade {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #FFF5F8;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+        .grade-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--pink);
+        }
+        .grade-label { font-size: 12px; color: var(--hint); }
+        .teacher-comment {
+            background: #E3F2FD;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 13px;
+            color: #1565C0;
+            margin-bottom: 12px;
+        }
+        .teacher-comment::before {
+            content: '👩‍🏫 Комментарий: ';
+            font-weight: 700;
+        }
+        .viewer-actions { display: flex; gap: 8px; }
+        .viewer-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .viewer-btn-primary {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+        }
+        .viewer-btn-danger {
+            background: #FFE5E5;
+            color: #FF4444;
+        }
+        .viewer-btn-secondary {
+            background: #F0F0F0;
+            color: var(--text);
+        }
         
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; padding: 8px 0 20px; z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--hint); text-decoration: none; font-size: 11px; }
@@ -57,7 +208,7 @@
     <div class="stats-grid">
         <div class="stat"><div class="stat-value" id="statBalance">0</div><div class="stat-label">Баллов</div></div>
         <div class="stat"><div class="stat-value" id="statDrawings">0</div><div class="stat-label">Рисунков</div></div>
-        <div class="stat"><div class="stat-value" id="statStreak">0</div><div class="stat-label">Дней</div></div>
+        <div class="stat"><div class="stat-value" id="statStreak">0</div><div class="stat-label">Дней подряд</div></div>
     </div>
     
     <div class="section">
@@ -74,7 +225,7 @@
         </a>
         <a href="../rewards/index.html" class="menu-item">
             <span class="menu-icon">🎁</span>
-            <span class="menu-text">Мои награды</span>
+            <span class="menu-text">Обменять баллы</span>
             <span class="menu-arrow">→</span>
         </a>
         <a href="tel:+79155622202" class="menu-item">
@@ -89,6 +240,18 @@
         </a>
     </div>
     
+    <!-- Просмотр рисунка -->
+    <div class="viewer" id="viewer">
+        <div class="viewer-top">
+            <div class="viewer-title" id="viewerTitle">Рисунок</div>
+            <button class="viewer-close" onclick="closeViewer()">✕</button>
+        </div>
+        <div class="viewer-canvas-wrap">
+            <img id="viewerImage" src="" alt="">
+        </div>
+        <div class="viewer-bottom" id="viewerBottom"></div>
+    </div>
+    
     <div class="bottom-nav">
         <a href="../index.html" class="nav-item"><span class="nav-icon">🏠</span><span>Главная</span></a>
         <a href="../draw/index.html" class="nav-item"><span class="nav-icon">✏️</span><span>Рисовать</span></a>
@@ -98,20 +261,21 @@
     </div>
     
     <script src="../shared/data/archetypes.js"></script>
+    <script src="../shared/js/storage.js"></script>
     <script>
         let tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#FF6B9D'); }
         
-        // Имя из Telegram
+        // Имя
         const user = tg?.initDataUnsafe?.user;
         if (user) {
             document.getElementById('userName').textContent = user.first_name || 'Художник';
         }
         
         // Данные
-        const balance = parseInt(localStorage.getItem('balance') || '0');
-        const drawings = JSON.parse(localStorage.getItem('drawings') || '[]');
-        const streak = parseInt(localStorage.getItem('streak') || '0');
+        const balance = Storage.getBalance();
+        const drawings = Storage.getDrawings();
+        const streak = Storage.getStreak();
         const archetypeId = localStorage.getItem('archetype');
         
         document.getElementById('statBalance').textContent = balance;
@@ -124,22 +288,124 @@
         }
         
         // Рисунки
-        const grid = document.getElementById('drawingsGrid');
-        if (drawings.length === 0) {
-            grid.innerHTML = `
-                <div class="empty-state" style="grid-column: 1/-1;">
-                    <div class="empty-emoji">🎨</div>
-                    <div>Пока нет рисунков</div>
-                    <div style="font-size: 13px; margin-top: 6px;">Начни рисовать прямо сейчас!</div>
+        function renderDrawings() {
+            const grid = document.getElementById('drawingsGrid');
+            
+            if (drawings.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state" style="grid-column: 1/-1;">
+                        <div class="empty-emoji">🎨</div>
+                        <div>Пока нет рисунков</div>
+                        <div style="font-size: 13px; margin-top: 6px;">Начни рисовать прямо сейчас!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = drawings.slice().reverse().map(d => {
+                let badge = '';
+                let badgeClass = '';
+                
+                if (d.teacherGrade) {
+                    badge = `⭐️ ${d.teacherGrade}`;
+                    badgeClass = 'graded';
+                } else if (d.submitted) {
+                    badge = '📤';
+                    badgeClass = 'submitted';
+                }
+                
+                return `
+                    <div class="drawing-thumb" onclick="openViewer(${d.id})">
+                        <img src="${d.image}" alt="${d.theme}">
+                        ${badge ? `<div class="drawing-badge ${badgeClass}">${badge}</div>` : ''}
+                        <div class="drawing-date">${d.dateFormatted}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Просмотр
+        function openViewer(id) {
+            const drawing = Storage.getDrawing(id);
+            if (!drawing) return;
+            
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            
+            document.getElementById('viewerTitle').textContent =
+                `${drawing.themeEmoji} ${drawing.theme}`;
+            document.getElementById('viewerImage').src = drawing.image;
+            
+            // Нижняя часть
+            let bottomHTML = `
+                <div class="viewer-info">📅 ${drawing.dateFormatted}</div>
+            `;
+            
+            if (drawing.teacherGrade) {
+                bottomHTML += `
+                    <div class="viewer-grade">
+                        <div class="grade-value">${drawing.teacherGrade}</div>
+                        <div class="grade-label">оценка<br>преподавателя</div>
+                    </div>
+                `;
+            }
+            
+            if (drawing.teacherComment) {
+                bottomHTML += `
+                    <div class="teacher-comment">${drawing.teacherComment}</div>
+                `;
+            }
+            
+            bottomHTML += `
+                <div class="viewer-actions">
+                    <button class="viewer-btn viewer-btn-danger" onclick="deleteDrawing(${drawing.id})">
+                        🗑 Удалить
+                    </button>
+                    ${!drawing.submitted ? `
+                        <button class="viewer-btn viewer-btn-primary" onclick="submitFromViewer(${drawing.id})">
+                            📤 Отправить
+                        </button>
+                    ` : `
+                        <button class="viewer-btn viewer-btn-secondary" disabled>
+                            ✓ Отправлено
+                        </button>
+                    `}
                 </div>
             `;
-        } else {
-            grid.innerHTML = drawings.slice(-9).reverse().map(d => `
-                <div class="drawing-thumb">
-                    <img src="${d.image}" alt="${d.theme}">
-                </div>
-            `).join('');
+            
+            document.getElementById('viewerBottom').innerHTML = bottomHTML;
+            document.getElementById('viewer').classList.add('open');
         }
+        
+        function closeViewer() {
+            document.getElementById('viewer').classList.remove('open');
+        }
+        
+        function deleteDrawing(id) {
+            if (!confirm('Удалить этот рисунок?')) return;
+            Storage.deleteDrawing(id);
+            closeViewer();
+            renderDrawings();
+            
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('warning');
+            
+            // Обновляем статистику
+            document.getElementById('statDrawings').textContent = Storage.getDrawings().length;
+        }
+        
+        function submitFromViewer(id) {
+            const success = Storage.submitToTeacher(id);
+            
+            if (success) {
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                alert('✅ Рисунок отправлен преподавателю!');
+                closeViewer();
+                renderDrawings();
+            } else {
+                alert('⚠️ Не удалось отправить');
+            }
+        }
+        
+        renderDrawings();
     </script>
 </body>
 </html>

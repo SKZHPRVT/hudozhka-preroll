@@ -34,14 +34,14 @@
         .top-bar {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
-            padding: 12px 16px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-shrink: 0;
         }
         
-        .back-btn {
+        .back-btn, .icon-btn {
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
@@ -53,32 +53,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         
-        .top-bar-info {
-            flex: 1;
-        }
+        .top-bar-info { flex: 1; min-width: 0; }
         
         .theme-label {
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0.85;
             margin-bottom: 2px;
         }
         
         .theme-text {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
-        }
-        
-        .hint-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            font-size: 16px;
-            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         /* ========== ХОЛСТ ========== */
@@ -87,70 +78,140 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10px;
+            padding: 8px;
             position: relative;
             min-height: 0;
+            background: #F0F0F0;
         }
         
         #drawingCanvas {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             touch-action: none;
             cursor: crosshair;
             max-width: 100%;
             max-height: 100%;
+            display: block;
         }
         
         .hint-bubble {
             position: absolute;
-            top: 20px;
+            top: 16px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             color: white;
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 12px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 5;
+            white-space: nowrap;
         }
         
-        .hint-bubble.show {
-            opacity: 1;
-        }
+        .hint-bubble.show { opacity: 1; }
         
         /* ========== ИНСТРУМЕНТЫ ========== */
         .tools {
             background: white;
             border-top: 1px solid #eee;
-            padding: 10px 12px 16px;
+            padding: 8px 10px 12px;
             flex-shrink: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
         
+        /* Верхняя строка — размер и отмена */
+        .tools-top {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .size-slider {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #F5F5F5;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+        
+        .size-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+            transition: all 0.15s;
+        }
+        
+        .size-preview[data-size="1"] { width: 4px; height: 4px; }
+        .size-preview[data-size="2"] { width: 8px; height: 8px; }
+        .size-preview[data-size="3"] { width: 14px; height: 14px; }
+        .size-preview[data-size="4"] { width: 22px; height: 22px; }
+        .size-preview[data-size="5"] { width: 30px; height: 30px; }
+        
+        #sizeSlider {
+            flex: 1;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        #sizeSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255,107,157,0.4);
+        }
+        
+        #sizeSlider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(255,107,157,0.4);
+        }
+        
+        /* Кисти */
         .brushes-row {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             overflow-x: auto;
             padding-bottom: 8px;
             -webkit-overflow-scrolling: touch;
         }
         
+        .brushes-row::-webkit-scrollbar { display: none; }
+        
         .brush-btn {
-            min-width: 44px;
-            height: 44px;
+            min-width: 48px;
+            height: 48px;
             border-radius: 12px;
             border: 2px solid transparent;
             background: #F5F5F5;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            position: relative;
         }
         
         .brush-btn.active {
@@ -160,16 +221,20 @@
         }
         
         .brush-btn:active {
-            transform: scale(0.95);
+            transform: scale(0.92);
         }
         
+        /* Цвета */
         .colors-row {
             display: flex;
             gap: 6px;
             overflow-x: auto;
-            padding-bottom: 10px;
+            padding-bottom: 8px;
             -webkit-overflow-scrolling: touch;
+            align-items: center;
         }
+        
+        .colors-row::-webkit-scrollbar { display: none; }
         
         .color-btn {
             min-width: 32px;
@@ -178,29 +243,56 @@
             border: 2px solid white;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             flex-shrink: 0;
         }
         
         .color-btn.active {
-            transform: scale(1.25);
+            transform: scale(1.3);
             box-shadow: 0 0 0 2px var(--pink), 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 2;
         }
         
+        .color-picker {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px dashed #ccc;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .color-picker input[type="color"] {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        /* Кнопки действий */
         .actions-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1.5fr;
             gap: 8px;
+            padding-top: 4px;
         }
         
         .action-btn {
-            padding: 12px;
+            padding: 12px 8px;
             border-radius: 12px;
             border: none;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,7 +319,7 @@
             box-shadow: 0 4px 12px rgba(255,107,157,0.3);
         }
         
-        /* ========== ФИНАЛЬНОЕ МОДАЛЬНОЕ ОКНО ========== */
+        /* ========== МОДАЛЬНОЕ ОКНО ФИНАЛА ========== */
         .modal {
             display: none;
             position: fixed;
@@ -264,6 +356,12 @@
         .modal-emoji {
             font-size: 64px;
             margin-bottom: 12px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
         }
         
         .modal-title {
@@ -303,20 +401,47 @@
             color: white;
             border: none;
             border-radius: 14px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .modal-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .modal-btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid #eee;
         }
         
         .modal-btn-secondary {
             width: 100%;
-            padding: 14px;
+            padding: 12px;
             background: transparent;
             color: var(--hint);
             border: none;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
+        }
+        
+        .submitted-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #E8F5E9;
+            color: #4CAF50;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
         }
     </style>
 </head>
@@ -328,22 +453,36 @@
             <div class="theme-label">📅 Тема дня</div>
             <div class="theme-text" id="themeText">Загрузка...</div>
         </div>
-        <button class="hint-btn" onclick="showHint()">💡</button>
+        <button class="icon-btn" onclick="showHint()">💡</button>
+        <button class="icon-btn" onclick="toggleFullscreen()">⛶</button>
     </div>
     
     <!-- ХОЛСТ -->
-    <div class="canvas-wrapper">
+    <div class="canvas-wrapper" id="canvasWrapper">
         <canvas id="drawingCanvas"></canvas>
         <div class="hint-bubble" id="hintBubble"></div>
     </div>
     
     <!-- ИНСТРУМЕНТЫ -->
     <div class="tools">
+        <!-- Размер кисти -->
+        <div class="tools-top">
+            <div class="size-slider">
+                <div class="size-preview" id="sizePreview" data-size="2"></div>
+                <input type="range" id="sizeSlider" min="1" max="5" value="2" step="1">
+            </div>
+        </div>
+        
+        <!-- Кисти -->
         <div class="brushes-row" id="brushesRow"></div>
+        
+        <!-- Цвета -->
         <div class="colors-row" id="colorsRow"></div>
+        
+        <!-- Действия -->
         <div class="actions-row">
-            <button class="action-btn btn-undo" onclick="undo()">↶ Отмена</button>
-            <button class="action-btn btn-clear" onclick="clearCanvas()">🗑 Очистить</button>
+            <button class="action-btn btn-undo" onclick="undo()">↶</button>
+            <button class="action-btn btn-clear" onclick="clearCanvas()">🗑</button>
             <button class="action-btn btn-done" onclick="finishDrawing()">✓ Готово</button>
         </div>
     </div>
@@ -352,25 +491,30 @@
     <div class="modal" id="successModal">
         <div class="modal-content">
             <div class="modal-emoji">🎉</div>
-            <div class="modal-title">Отличная работа!</div>
-            <div class="modal-sub">Ты нарисовал(а) рисунок дня</div>
+            <div class="modal-title">Отличный рисунок!</div>
+            <div class="modal-sub" id="modalSub">Ты нарисовал(а) «Осенний лист»</div>
             <div class="points-earned">
                 <div class="points-value">+10</div>
                 <div class="points-label">баллов</div>
             </div>
-            <button class="modal-btn" onclick="location.href='../index.html'">
-                На главную
+            
+            <button class="modal-btn" onclick="submitToTeacher()">
+                📤 Отправить преподавателю
+            </button>
+            <button class="modal-btn modal-btn-outline" onclick="location.href='../index.html'">
+                🏠 На главную
             </button>
             <button class="modal-btn-secondary" onclick="continueDrawing()">
-                Нарисовать ещё
+                ✏️ Нарисовать ещё
             </button>
         </div>
     </div>
     
     <!-- ДАННЫЕ -->
     <script src="../shared/data/themes.js"></script>
+    <script src="../shared/js/storage.js"></script>
     
-    <!-- ЛОГИКА РИСОВАНИЯ -->
+    <!-- ЛОГИКА -->
     <script>
         // ========== TELEGRAM ==========
         let tg = window.Telegram?.WebApp;
@@ -384,7 +528,9 @@
         
         function goBack() {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-            location.href = '../index.html';
+            if (confirm('Выйти? Рисунок не сохранится.')) {
+                location.href = '../index.html';
+            }
         }
         
         // ========== ТЕМА ДНЯ ==========
@@ -399,60 +545,91 @@
             setTimeout(() => bubble.classList.remove('show'), 3000);
         }
         
-        // ========== CANVAS ==========
+        // ========== КИСТИ ==========
+        const BRUSHES = [
+            { id: 'pencil', name: 'Карандаш', icon: '✏️', baseSize: 2, opacity: 1, texture: 'sharp' },
+            { id: 'pen', name: 'Ручка', icon: '🖊', baseSize: 3, opacity: 1, texture: 'sharp' },
+            { id: 'marker', name: 'Маркер', icon: '🖍', baseSize: 8, opacity: 0.9, texture: 'smooth' },
+            { id: 'brush', name: 'Кисть', icon: '🖌', baseSize: 12, opacity: 0.8, texture: 'smooth' },
+            { id: 'watercolor', name: 'Акварель', icon: '💧', baseSize: 18, opacity: 0.4, texture: 'watery' },
+            { id: 'gouache', name: 'Гуашь', icon: '🎨', baseSize: 20, opacity: 0.95, texture: 'rough' },
+            { id: 'oil', name: 'Масло', icon: '🖼', baseSize: 16, opacity: 0.85, texture: 'textured' },
+            { id: 'pastel', name: 'Пастель', icon: '🌈', baseSize: 14, opacity: 0.7, texture: 'grainy' },
+            { id: 'charcoal', name: 'Уголь', icon: '⚫️', baseSize: 10, opacity: 0.85, texture: 'grainy' },
+            { id: 'spray', name: 'Спрей', icon: '💨', baseSize: 24, opacity: 0.3, texture: 'spray' },
+            { id: 'neon', name: 'Неон', icon: '✨', baseSize: 6, opacity: 0.9, texture: 'glow' },
+            { id: 'eraser', name: 'Ластик', icon: '🧽', baseSize: 20, opacity: 1, texture: 'eraser' }
+        ];
+        
+        const COLORS = [
+            '#000000', '#FFFFFF', '#808080',
+            '#FF0000', '#FF6B00', '#FFD700', '#FFEB3B',
+            '#4CAF50', '#8BC34A', '#00BCD4', '#2196F3',
+            '#3F51B5', '#9C27B0', '#E91E63', '#795548',
+            '#8B4513', '#FFB6C1', '#FFE4B5'
+        ];
+        
+        // ========== СОСТОЯНИЕ ==========
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
         
-        // Настройки
-        const colors = [
-            '#000000', '#FFFFFF', '#FF0000', '#FF6B00', '#FFD700',
-            '#4CAF50', '#00BCD4', '#2196F3', '#3F51B5', '#9C27B0',
-            '#E91E63', '#795548', '#607D8B', '#8B4513', '#FFB6C1'
-        ];
-        
-        const brushes = [
-            { id: 'pencil', name: 'Карандаш', icon: '✏️', size: 2, opacity: 1, color: '#333' },
-            { id: 'marker', name: 'Маркер', icon: '🖊', size: 8, opacity: 0.9, color: null },
-            { id: 'brush', name: 'Кисть', icon: '🖌', size: 16, opacity: 0.7, color: null },
-            { id: 'watercolor', name: 'Акварель', icon: '🎨', size: 24, opacity: 0.4, color: null },
-            { id: 'eraser', name: 'Ластик', icon: '🧽', size: 24, opacity: 1, color: '#FFFFFF' }
-        ];
-        
+        let currentBrush = BRUSHES[0];
         let currentColor = '#000000';
-        let currentBrush = brushes[0];
+        let currentSizeLevel = 2;
         let isDrawing = false;
         let history = [];
-        let maxHistory = 20;
+        let maxHistory = 25;
+        let canvasSize = 0;
+        let dpr = 1;
+        let lastPoint = null;
+        let sprayInterval = null;
         
-        // ========== ИНИЦИАЛИЗАЦИЯ CANVAS ==========
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
         function initCanvas() {
-            // Размер canvas = размер wrapper
-            const wrapper = canvas.parentElement;
+            const wrapper = document.getElementById('canvasWrapper');
             const rect = wrapper.getBoundingClientRect();
             
-            // Соотношение сторон 1:1 для квадратного холста
-            const size = Math.min(rect.width - 20, rect.height - 20);
+            canvasSize = Math.min(rect.width - 16, rect.height - 16);
+            dpr = window.devicePixelRatio || 1;
             
-            // Учитываем devicePixelRatio для четкости
-            const dpr = window.devicePixelRatio || 1;
-            
-            canvas.style.width = size + 'px';
-            canvas.style.height = size + 'px';
-            canvas.width = size * dpr;
-            canvas.height = size * dpr;
+            canvas.style.width = canvasSize + 'px';
+            canvas.style.height = canvasSize + 'px';
+            canvas.width = canvasSize * dpr;
+            canvas.height = canvasSize * dpr;
             
             ctx.scale(dpr, dpr);
             
             // Белый фон
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, size, size);
+            ctx.fillRect(0, 0, canvasSize, canvasSize);
             
-            // Начальный цвет карандаша
-            ctx.strokeStyle = currentColor;
-            ctx.lineWidth = currentBrush.size;
+            applyBrushSettings();
+        }
+        
+        // ========== НАСТРОЙКИ КИСТИ ==========
+        function applyBrushSettings() {
+            const size = currentBrush.baseSize * currentSizeLevel;
+            
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.globalAlpha = currentBrush.opacity;
+            
+            if (currentBrush.texture === 'eraser') {
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.globalAlpha = 1;
+                ctx.lineWidth = size * 1.5;
+                ctx.globalCompositeOperation = 'source-over';
+            } else if (currentBrush.texture === 'glow') {
+                ctx.strokeStyle = currentColor;
+                ctx.globalAlpha = currentBrush.opacity;
+                ctx.lineWidth = size;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = currentColor;
+            } else {
+                ctx.strokeStyle = currentColor;
+                ctx.globalAlpha = currentBrush.opacity;
+                ctx.lineWidth = size;
+                ctx.shadowBlur = 0;
+            }
         }
         
         // ========== РИСОВАНИЕ ==========
@@ -469,21 +646,34 @@
             }
             
             return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
+                x: (clientX - rect.left) / (rect.width / canvasSize),
+                y: (clientY - rect.top) / (rect.height / canvasSize)
             };
         }
         
         function startDrawing(e) {
             e.preventDefault();
             isDrawing = true;
-            
-            // Сохраняем состояние для undo
             saveHistory();
             
             const pos = getPosition(e);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
+            lastPoint = pos;
+            
+            // Для спрея — интервальная отрисовка
+            if (currentBrush.texture === 'spray') {
+                drawSpray(pos);
+                sprayInterval = setInterval(() => {
+                    if (lastPoint) drawSpray(lastPoint);
+                }, 50);
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+                // Точка на месте клика
+                ctx.lineTo(pos.x + 0.1, pos.y + 0.1);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            }
             
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
@@ -493,6 +683,77 @@
             e.preventDefault();
             
             const pos = getPosition(e);
+            lastPoint = pos;
+            
+            if (currentBrush.texture === 'spray') {
+                drawSpray(pos);
+                return;
+            }
+            
+            // Для гранулированных текстур — множественные линии
+            if (currentBrush.texture === 'grainy') {
+                drawGrainy(pos);
+                return;
+            }
+            
+            // Для текстурированных — рисуем с вариацией
+            if (currentBrush.texture === 'textured') {
+                drawTextured(pos);
+                return;
+            }
+            
+            // Обычная линия
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+        
+        function drawSpray(pos) {
+            const density = currentSizeLevel * 15;
+            const radius = currentBrush.baseSize * currentSizeLevel;
+            
+            ctx.fillStyle = currentColor;
+            ctx.globalAlpha = currentBrush.opacity;
+            
+            for (let i = 0; i < density; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * radius;
+                const x = pos.x + Math.cos(angle) * dist;
+                const y = pos.y + Math.sin(angle) * dist;
+                const size = Math.random() * 1.5 + 0.5;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        function drawGrainy(pos) {
+            const lines = 3;
+            const offset = currentBrush.baseSize * currentSizeLevel * 0.4;
+            
+            for (let i = 0; i < lines; i++) {
+                const jitterX = (Math.random() - 0.5) * offset;
+                const jitterY = (Math.random() - 0.5) * offset;
+                
+                ctx.beginPath();
+                ctx.moveTo(lastPoint.x + jitterX, lastPoint.y + jitterY);
+                ctx.lineTo(pos.x + jitterX, pos.y + jitterY);
+                ctx.stroke();
+            }
+        }
+        
+        function drawTextured(pos) {
+            const offset = currentBrush.baseSize * currentSizeLevel * 0.3;
+            
+            ctx.beginPath();
+            ctx.moveTo(pos.x + (Math.random() - 0.5) * offset,
+                       pos.y + (Math.random() - 0.5) * offset);
+            ctx.lineTo(pos.x + (Math.random() - 0.5) * offset,
+                       pos.y + (Math.random() - 0.5) * offset);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(lastPoint.x, lastPoint.y);
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
         }
@@ -500,7 +761,13 @@
         function stopDrawing(e) {
             if (!isDrawing) return;
             isDrawing = false;
+            lastPoint = null;
             ctx.closePath();
+            
+            if (sprayInterval) {
+                clearInterval(sprayInterval);
+                sprayInterval = null;
+            }
         }
         
         // Подписки
@@ -508,23 +775,16 @@
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseleave', stopDrawing);
-        
         canvas.addEventListener('touchstart', startDrawing, { passive: false });
         canvas.addEventListener('touchmove', draw, { passive: false });
         canvas.addEventListener('touchend', stopDrawing);
         canvas.addEventListener('touchcancel', stopDrawing);
         
-        // ========== ИСТОРИЯ (UNDO) ==========
+        // ========== ИСТОРИЯ ==========
         function saveHistory() {
-            const dpr = window.devicePixelRatio || 1;
-            const size = canvas.width;
-            
-            const imageData = ctx.getImageData(0, 0, size, size);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
             history.push(imageData);
-            
-            if (history.length > maxHistory) {
-                history.shift();
-            }
+            if (history.length > maxHistory) history.shift();
         }
         
         function undo() {
@@ -541,21 +801,17 @@
             
             saveHistory();
             
-            const dpr = window.devicePixelRatio || 1;
-            const size = canvas.width / dpr;
-            
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, size, size);
+            ctx.fillRect(0, 0, canvasSize, canvasSize);
             
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
         
-        // ========== ИНСТРУМЕНТЫ ==========
+        // ========== UI ==========
         function renderBrushes() {
             const container = document.getElementById('brushesRow');
-            
-            container.innerHTML = brushes.map(b => `
-                <button class="brush-btn ${b.id === currentBrush.id ? 'active' : ''}" 
+            container.innerHTML = BRUSHES.map(b => `
+                <button class="brush-btn ${b.id === currentBrush.id ? 'active' : ''}"
                         onclick="selectBrush('${b.id}')"
                         title="${b.name}">
                     ${b.icon}
@@ -564,92 +820,119 @@
         }
         
         function selectBrush(id) {
-            currentBrush = brushes.find(b => b.id === id);
-            
-            if (id === 'eraser') {
-                ctx.strokeStyle = '#FFFFFF';
-            } else {
-                ctx.strokeStyle = currentColor;
-            }
-            
-            ctx.lineWidth = currentBrush.size;
-            ctx.globalAlpha = currentBrush.opacity;
-            
+            currentBrush = BRUSHES.find(b => b.id === id);
+            applyBrushSettings();
             renderBrushes();
+            updateSizePreview();
+            
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
         
         function renderColors() {
             const container = document.getElementById('colorsRow');
             
-            container.innerHTML = colors.map(c => `
-                <button class="color-btn ${c === currentColor ? 'active' : ''}" 
+            let html = COLORS.map(c => `
+                <button class="color-btn ${c === currentColor ? 'active' : ''}"
                         style="background: ${c}"
                         onclick="selectColor('${c}')">
                 </button>
             `).join('');
+            
+            // Кастомный цвет
+            html += `
+                <div class="color-picker">
+                    🎨
+                    <input type="color" value="${currentColor}" onchange="selectColor(this.value)">
+                </div>
+            `;
+            
+            container.innerHTML = html;
         }
         
         function selectColor(color) {
             currentColor = color;
             
-            if (currentBrush.id !== 'eraser') {
+            if (currentBrush.texture !== 'eraser') {
                 ctx.strokeStyle = color;
             }
             
             renderColors();
+            updateSizePreview();
+            
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
         
-        // ========== ЗАВЕРШЕНИЕ ==========
+        function updateSizePreview() {
+            const preview = document.getElementById('sizePreview');
+            preview.setAttribute('data-size', currentSizeLevel);
+            preview.style.color = currentBrush.texture === 'eraser' ? '#ddd' : currentColor;
+        }
+        
+        // Слайдер размера
+        document.getElementById('sizeSlider').addEventListener('input', (e) => {
+            currentSizeLevel = parseInt(e.target.value);
+            applyBrushSettings();
+            updateSizePreview();
+        });
+        
+        // ========== FULLSCREEN ==========
+        function toggleFullscreen() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen().catch(() => {});
+            }
+        }
+        
+        // ========== СОХРАНЕНИЕ ==========
         function finishDrawing() {
             // Проверяем что что-то нарисовано
-            // Простая проверка: смотрим есть ли не белые пиксели
-            
-            const state = JSON.parse(localStorage.getItem('state') || '{}');
-            const today = new Date().toDateString();
-            const lastDrawDate = localStorage.getItem('lastDrawDate') || '';
+            const imageData = canvas.toDataURL('image/png');
             
             // Начисляем баллы
-            let balance = parseInt(localStorage.getItem('balance') || '0');
-            let drawings = JSON.parse(localStorage.getItem('drawings') || '[]');
-            let streak = parseInt(localStorage.getItem('streak') || '0');
-            
-            // Проверяем стрик
-            const yesterday = new Date();
-            yesterday.setDate(yesterday.getDate() - 1);
-            
-            if (lastDrawDate === yesterday.toDateString()) {
-                streak++;
-            } else if (lastDrawDate !== today) {
-                streak = 1;
-            }
-            
-            // Начисляем баллы
-            const pointsEarned = 10;
-            balance += pointsEarned;
+            Storage.addBalance(10);
+            const streak = Storage.updateStreak();
             
             // Сохраняем рисунок
-            const imageData = canvas.toDataURL('image/png');
-            drawings.push({
-                id: Date.now(),
+            const drawing = Storage.saveDrawing({
                 theme: todayTheme.text,
-                date: today,
+                themeEmoji: todayTheme.emoji,
                 image: imageData
             });
             
-            // Сохраняем в localStorage
-            localStorage.setItem('balance', balance);
-            localStorage.setItem('drawings', JSON.stringify(drawings));
-            localStorage.setItem('streak', streak);
-            localStorage.setItem('lastDrawDate', today);
+            // Стрик бонус
+            if (streak > 1 && streak % 7 === 0) {
+                Storage.addBalance(50);
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            }
             
-            // Показываем модальное окно
+            // Показываем модалку
+            document.getElementById('modalSub').textContent =
+                `Ты нарисовал(а) «${todayTheme.text}»`;
+            
             document.getElementById('successModal').classList.add('open');
+            document.getElementById('successModal').dataset.drawingId = drawing.id;
             
             if (tg?.HapticFeedback) {
                 tg.HapticFeedback.notificationOccurred('success');
             }
+        }
+        
+        function submitToTeacher() {
+            const drawingId = parseInt(document.getElementById('successModal').dataset.drawingId);
+            
+            const success = Storage.submitToTeacher(drawingId);
+            
+            if (success) {
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                alert('✅ Рисунок отправлен преподавателю!\n\nОн оценит его в ближайшее время.');
+            } else {
+                alert('⚠️ Не удалось отправить.\n\nПопробуй позже или покажи рисунок преподавателю в школе.');
+            }
+            
+            setTimeout(() => {
+                location.href = '../profile/index.html';
+            }, 1000);
         }
         
         function continueDrawing() {
@@ -658,24 +941,17 @@
             clearCanvas();
         }
         
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // ========== СТАРТ ==========
         window.addEventListener('load', () => {
             initCanvas();
             renderBrushes();
             renderColors();
+            updateSizePreview();
         });
         
-        window.addEventListener('resize', () => {
-            // Пересчитываем canvas при повороте экрана
-            // (пока просто сбрасываем)
-        });
+        setTimeout(() => showHint(), 1500);
         
-        // Показываем подсказку через 1 секунду
-        setTimeout(() => {
-            showHint();
-        }, 1500);
-        
-        console.log('🎨 Холст для рисования готов');
+        console.log('🎨 Рисовашка: 12 кистей загружено');
     </script>
 </body>
 </html>

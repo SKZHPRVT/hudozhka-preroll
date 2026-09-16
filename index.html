@@ -18,7 +18,7 @@
             --hint: #999999;
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -49,6 +49,7 @@
             right: -20px;
             font-size: 160px;
             opacity: 0.15;
+            pointer-events: none;
         }
         
         .hero-top {
@@ -77,6 +78,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .balance:active {
+            background: rgba(255,255,255,0.35);
         }
         
         .hero-content {
@@ -96,6 +103,32 @@
             opacity: 0.9;
         }
         
+        /* Стрик */
+        .streak-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.25);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 12px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .streak-badge.active {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
         /* ========== БЛОК ТЕМЫ ДНЯ ========== */
         .section {
             padding: 16px 20px;
@@ -112,6 +145,11 @@
             overflow: hidden;
         }
         
+        .theme-card.done {
+            border-color: var(--green);
+            background: linear-gradient(135deg, #F0FFF5, #E5FFE5);
+        }
+        
         .theme-label {
             font-size: 12px;
             color: var(--pink);
@@ -121,10 +159,15 @@
             margin-bottom: 8px;
         }
         
+        .theme-card.done .theme-label {
+            color: var(--green);
+        }
+        
         .theme-emoji {
             font-size: 56px;
             margin-bottom: 8px;
             animation: float 3s ease-in-out infinite;
+            display: inline-block;
         }
         
         @keyframes float {
@@ -162,6 +205,11 @@
             transform: scale(0.97);
         }
         
+        .theme-btn.done {
+            background: linear-gradient(135deg, #4CAF50, #2ECC71);
+            box-shadow: 0 4px 12px rgba(76,175,80,0.3);
+        }
+        
         /* ========== БЛОК КВЕСТА ========== */
         .quest-card {
             background: linear-gradient(135deg, #4ECDC4, #2ECC71);
@@ -174,10 +222,15 @@
             gap: 14px;
             cursor: pointer;
             transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(78,205,196,0.3);
         }
         
         .quest-card:active {
             transform: scale(0.98);
+        }
+        
+        .quest-card.done {
+            background: linear-gradient(135deg, #9B59B6, #8E44AD);
         }
         
         .quest-icon {
@@ -187,6 +240,7 @@
         
         .quest-info {
             flex: 1;
+            min-width: 0;
         }
         
         .quest-title {
@@ -208,6 +262,20 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            justify-content: space-between;
+        }
+        
+        .section-title-text {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .section-link {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--pink);
+            text-decoration: none;
         }
         
         .achievements {
@@ -221,6 +289,10 @@
             -webkit-overflow-scrolling: touch;
         }
         
+        .achievements::-webkit-scrollbar {
+            display: none;
+        }
+        
         .achievement {
             min-width: 90px;
             background: white;
@@ -228,6 +300,7 @@
             padding: 14px 10px;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            flex-shrink: 0;
         }
         
         .achievement-icon {
@@ -253,6 +326,7 @@
             font-size: 11px;
             font-weight: 600;
             color: var(--text);
+            line-height: 1.2;
         }
         
         /* ========== СТАТИСТИКА ========== */
@@ -281,6 +355,68 @@
             font-size: 11px;
             color: var(--hint);
             margin-top: 2px;
+        }
+        
+        /* ========== МИНИ-ПРЕВЬЮ РИСУНКОВ ========== */
+        .mini-gallery {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .mini-gallery::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .mini-drawing {
+            min-width: 90px;
+            height: 90px;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        
+        .mini-drawing:active {
+            transform: scale(0.95);
+        }
+        
+        .mini-drawing img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .mini-drawing-grade {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(76,175,80,0.9);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .mini-empty {
+            min-width: 100%;
+            padding: 24px;
+            text-align: center;
+            color: var(--hint);
+            font-size: 13px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
         }
         
         /* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
@@ -320,6 +456,99 @@
             font-size: 24px;
             margin-bottom: 2px;
         }
+        
+        /* ========== МОДАЛКА БАЛАНСА ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.open {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            animation: popIn 0.3s ease-out;
+        }
+        
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .balance-big {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .balance-big-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--pink);
+            line-height: 1;
+        }
+        
+        .balance-big-label {
+            font-size: 13px;
+            color: var(--hint);
+            margin-top: 4px;
+        }
+        
+        .balance-hint {
+            background: #F5F5F5;
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .balance-hint-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .balance-hint-list {
+            font-size: 12px;
+            color: var(--hint);
+            line-height: 1.6;
+        }
+        
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        .modal-btn:active {
+            transform: scale(0.97);
+        }
     </style>
 </head>
 <body>
@@ -327,22 +556,27 @@
     <div class="hero">
         <div class="hero-top">
             <div class="logo">🎨 Рисовашка</div>
-            <div class="balance">🪙 <span id="balance">0</span></div>
+            <div class="balance" onclick="showBalance()">
+                🪙 <span id="balance">0</span>
+            </div>
         </div>
         <div class="hero-content">
             <div class="hero-title">Рисуй каждый день</div>
             <div class="hero-sub">Зарабатывай баллы и получай подарки</div>
+            <div class="streak-badge" id="streakBadge">
+                🔥 <span id="streakValue">0</span> дней подряд
+            </div>
         </div>
     </div>
     
     <!-- ТЕМА ДНЯ -->
     <div class="section">
-        <div class="theme-card">
-            <div class="theme-label">📅 Тема дня</div>
+        <div class="theme-card" id="themeCard">
+            <div class="theme-label" id="themeLabel">📅 Тема дня</div>
             <div class="theme-emoji" id="themeEmoji">🎨</div>
             <div class="theme-name" id="themeName">Загрузка...</div>
             <div class="theme-hint" id="themeHint"></div>
-            <button class="theme-btn" onclick="startDrawing()">
+            <button class="theme-btn" id="themeBtn" onclick="startDrawing()">
                 ✏️ Начать рисовать
             </button>
         </div>
@@ -350,11 +584,11 @@
     
     <!-- КВЕСТ -->
     <div class="section">
-        <div class="quest-card" onclick="location.href='quiz/index.html'">
-            <div class="quest-icon">🎯</div>
+        <div class="quest-card" id="questCard" onclick="startQuiz()">
+            <div class="quest-icon" id="questIcon">🎯</div>
             <div class="quest-info">
-                <div class="quest-title">Узнай свой архетип</div>
-                <div class="quest-desc">Пройди квест → получи +50 баллов</div>
+                <div class="quest-title" id="questTitle">Узнай свой архетип</div>
+                <div class="quest-desc" id="questDesc">Пройди квест → получи +50 баллов</div>
             </div>
         </div>
     </div>
@@ -377,12 +611,21 @@
         </div>
     </div>
     
+    <!-- МОИ РИСУНКИ -->
+    <div class="section">
+        <div class="section-title">
+            <div class="section-title-text">🖼 Мои рисунки</div>
+            <a href="profile/index.html" class="section-link">Все →</a>
+        </div>
+        <div class="mini-gallery" id="miniGallery"></div>
+    </div>
+    
     <!-- ДОСТИЖЕНИЯ -->
     <div class="section">
-        <div class="section-title">🏆 Мои награды</div>
-        <div class="achievements" id="achievementsList">
-            <!-- Заполняется через JS -->
+        <div class="section-title">
+            <div class="section-title-text">🏆 Мои награды</div>
         </div>
+        <div class="achievements" id="achievementsList"></div>
     </div>
     
     <!-- НИЖНЯЯ НАВИГАЦИЯ -->
@@ -409,11 +652,33 @@
         </a>
     </div>
     
+    <!-- МОДАЛКА БАЛАНСА -->
+    <div class="modal" id="balanceModal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-title">🪙 Твой баланс</div>
+            <div class="balance-big">
+                <div class="balance-big-value" id="modalBalance">0</div>
+                <div class="balance-big-label">баллов</div>
+            </div>
+            <div class="balance-hint">
+                <div class="balance-hint-title">💡 Как заработать баллы:</div>
+                <div class="balance-hint-list">
+                    ✏️ Рисунок дня — <b>+10</b><br>
+                    🎯 Пройти квест — <b>+50</b><br>
+                    🔥 Стрик 7 дней — <b>+50</b><br>
+                    ⭐️ Оценка преподавателя — <b>+20</b>
+                </div>
+            </div>
+            <button class="modal-btn" onclick="closeModalBtn()">Понятно!</button>
+        </div>
+    </div>
+    
     <!-- ДАННЫЕ -->
     <script src="shared/data/themes.js"></script>
     <script src="shared/data/archetypes.js"></script>
     <script src="shared/data/courses.js"></script>
     <script src="shared/data/quiz.js"></script>
+    <script src="shared/js/storage.js"></script>
     
     <!-- ЛОГИКА -->
     <script>
@@ -426,66 +691,178 @@
             tg.setBackgroundColor('#FFF5F8');
         }
         
-        // ========== СОСТОЯНИЕ ==========
-        function getState() {
-            return {
-                balance: parseInt(localStorage.getItem('balance') || '0'),
-                drawings: JSON.parse(localStorage.getItem('drawings') || '[]'),
-                achievements: JSON.parse(localStorage.getItem('achievements') || '[]'),
-                streak: parseInt(localStorage.getItem('streak') || '0'),
-                lastDrawDate: localStorage.getItem('lastDrawDate') || '',
-                archetype: localStorage.getItem('archetype') || null
-            };
-        }
-        
-        function saveState(key, value) {
-            if (typeof value === 'object') {
-                localStorage.setItem(key, JSON.stringify(value));
-            } else {
-                localStorage.setItem(key, value);
-            }
-        }
-        
         // ========== ТЕМА ДНЯ ==========
+        const todayTheme = getTodayTheme();
+        
         function loadTodayTheme() {
-            const theme = getTodayTheme();
-            document.getElementById('themeEmoji').textContent = theme.emoji;
-            document.getElementById('themeName').textContent = theme.text;
-            document.getElementById('themeHint').textContent = theme.hint;
+            const drawings = Storage.getDrawings();
+            const today = new Date().toDateString();
+            
+            // Проверяем, рисовали ли сегодня
+            const drewToday = drawings.some(d => {
+                const dDate = new Date(d.date).toDateString();
+                return dDate === today;
+            });
+            
+            document.getElementById('themeEmoji').textContent = todayTheme.emoji;
+            document.getElementById('themeName').textContent = todayTheme.text;
+            document.getElementById('themeHint').textContent = todayTheme.hint;
+            
+            const card = document.getElementById('themeCard');
+            const btn = document.getElementById('themeBtn');
+            const label = document.getElementById('themeLabel');
+            
+            if (drewToday) {
+                card.classList.add('done');
+                btn.classList.add('done');
+                btn.textContent = '✓ Сегодня нарисовано';
+                btn.onclick = () => {
+                    if (confirm('Ты уже нарисовал(а) сегодня! Хочешь нарисовать ещё?')) {
+                        startDrawing();
+                    }
+                };
+                label.textContent = '✅ Выполнено сегодня';
+            } else {
+                card.classList.remove('done');
+                btn.classList.remove('done');
+                btn.textContent = '✏️ Начать рисовать';
+                btn.onclick = startDrawing;
+                label.textContent = '📅 Тема дня';
+            }
         }
         
         // ========== БАЛАНС ==========
         function updateBalance() {
-            const state = getState();
-            document.getElementById('balance').textContent = state.balance;
-            document.getElementById('drawingsCount').textContent = state.drawings.length;
-            document.getElementById('streakCount').textContent = state.streak;
-            document.getElementById('achievementsCount').textContent = state.achievements.length;
+            const balance = Storage.getBalance();
+            const drawings = Storage.getDrawings();
+            const streak = Storage.getStreak();
+            
+            document.getElementById('balance').textContent = balance;
+            document.getElementById('drawingsCount').textContent = drawings.length;
+            document.getElementById('streakCount').textContent = streak;
+            document.getElementById('streakValue').textContent = streak;
+            
+            // Стрик бейдж
+            const streakBadge = document.getElementById('streakBadge');
+            if (streak > 0) {
+                streakBadge.classList.add('active');
+                if (streak === 1) {
+                    streakBadge.innerHTML = '🔥 1 день';
+                } else if (streak < 5) {
+                    streakBadge.innerHTML = `🔥 ${streak} дня подряд`;
+                } else {
+                    streakBadge.innerHTML = `🔥 ${streak} дней подряд`;
+                }
+            } else {
+                streakBadge.classList.remove('active');
+                streakBadge.innerHTML = '🔥 Начни серию!';
+            }
+        }
+        
+        function showBalance() {
+            document.getElementById('modalBalance').textContent = Storage.getBalance();
+            document.getElementById('balanceModal').classList.add('open');
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+        
+        function closeModal(e) {
+            if (e.target === e.currentTarget) {
+                document.getElementById('balanceModal').classList.remove('open');
+            }
+        }
+        
+        function closeModalBtn() {
+            document.getElementById('balanceModal').classList.remove('open');
+        }
+        
+        // ========== МИНИ-ГАЛЕРЕЯ РИСУНКОВ ==========
+        function renderMiniGallery() {
+            const container = document.getElementById('miniGallery');
+            const drawings = Storage.getDrawings();
+            
+            if (drawings.length === 0) {
+                container.innerHTML = `
+                    <div class="mini-empty">
+                        🎨 Пока нет рисунков<br>
+                        <span style="font-size: 11px;">Начни рисовать прямо сейчас!</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Последние 6 рисунков
+            const recent = drawings.slice(-6).reverse();
+            
+            container.innerHTML = recent.map(d => `
+                <div class="mini-drawing" onclick="location.href='profile/index.html'">
+                    <img src="${d.image}" alt="${d.theme}">
+                    ${d.teacherGrade ? `<div class="mini-drawing-grade">⭐️${d.teacherGrade}</div>` : ''}
+                </div>
+            `).join('');
         }
         
         // ========== ДОСТИЖЕНИЯ ==========
         const ALL_ACHIEVEMENTS = [
-            { id: 'first-draw', name: 'Первый рисунок', icon: '🎨', condition: (s) => s.drawings.length >= 1 },
-            { id: 'five-draw', name: '5 рисунков', icon: '⭐️', condition: (s) => s.drawings.length >= 5 },
-            { id: 'ten-draw', name: '10 рисунков', icon: '🔥', condition: (s) => s.drawings.length >= 10 },
+            { id: 'first-draw', name: 'Первый рисунок', icon: '🎨', condition: (s) => s.drawingsCount >= 1 },
+            { id: 'five-draw', name: '5 рисунков', icon: '⭐️', condition: (s) => s.drawingsCount >= 5 },
+            { id: 'ten-draw', name: '10 рисунков', icon: '🔥', condition: (s) => s.drawingsCount >= 10 },
             { id: 'streak-3', name: '3 дня подряд', icon: '📅', condition: (s) => s.streak >= 3 },
             { id: 'streak-7', name: 'Неделя', icon: '💪', condition: (s) => s.streak >= 7 },
-            { id: 'quiz-done', name: 'Архетип', icon: '🎯', condition: (s) => s.archetype !== null }
+            { id: 'quiz-done', name: 'Архетип', icon: '🎯', condition: (s) => s.archetype !== null },
+            { id: 'first-grade', name: 'Первая оценка', icon: '🏅', condition: (s) => s.gradedCount >= 1 },
+            { id: 'balance-100', name: '100 баллов', icon: '💎', condition: (s) => s.balance >= 100 }
         ];
         
         function renderAchievements() {
-            const state = getState();
-            const container = document.getElementById('achievementsList');
+            const balance = Storage.getBalance();
+            const drawings = Storage.getDrawings();
+            const streak = Storage.getStreak();
+            const archetype = localStorage.getItem('archetype');
+            const gradedCount = drawings.filter(d => d.teacherGrade).length;
             
+            const state = {
+                balance,
+                drawingsCount: drawings.length,
+                streak,
+                archetype,
+                gradedCount
+            };
+            
+            const unlocked = ALL_ACHIEVEMENTS.filter(a => a.condition(state));
+            document.getElementById('achievementsCount').textContent = unlocked.length;
+            
+            const container = document.getElementById('achievementsList');
             container.innerHTML = ALL_ACHIEVEMENTS.map(a => {
-                const unlocked = a.condition(state);
+                const isUnlocked = a.condition(state);
                 return `
                     <div class="achievement">
-                        <div class="achievement-icon ${unlocked ? '' : 'locked'}">${a.icon}</div>
+                        <div class="achievement-icon ${isUnlocked ? '' : 'locked'}">${a.icon}</div>
                         <div class="achievement-name">${a.name}</div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        // ========== КВЕСТ ==========
+        function updateQuestCard() {
+            const archetype = localStorage.getItem('archetype');
+            const card = document.getElementById('questCard');
+            const icon = document.getElementById('questIcon');
+            const title = document.getElementById('questTitle');
+            const desc = document.getElementById('questDesc');
+            
+            if (archetype && ARCHETYPES[archetype]) {
+                const arch = ARCHETYPES[archetype];
+                card.classList.add('done');
+                icon.textContent = arch.emoji;
+                title.textContent = `Твой архетип: ${arch.name}`;
+                desc.textContent = 'Нажми, чтобы пройти заново';
+            } else {
+                card.classList.remove('done');
+                icon.textContent = '🎯';
+                title.textContent = 'Узнай свой архетип';
+                desc.textContent = 'Пройди квест → получи +50 баллов';
+            }
         }
         
         // ========== ДЕЙСТВИЯ ==========
@@ -494,12 +871,31 @@
             location.href = 'draw/index.html';
         }
         
+        function startQuiz() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            location.href = 'quiz/index.html';
+        }
+        
         // ========== ИНИЦИАЛИЗАЦИЯ ==========
-        loadTodayTheme();
-        updateBalance();
-        renderAchievements();
+        function init() {
+            loadTodayTheme();
+            updateBalance();
+            renderMiniGallery();
+            renderAchievements();
+            updateQuestCard();
+        }
+        
+        init();
+        
+        // Обновляем при возврате на страницу
+        window.addEventListener('pageshow', init);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) init();
+        });
         
         console.log('🎨 Рисовашка запущена');
+        console.log('📊 Баланс:', Storage.getBalance());
+        console.log('🖼 Рисунков:', Storage.getDrawings().length);
     </script>
 </body>
 </html>
