@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="telegram-web-app-capable" content="yes">
+    <title>🎨 Рисовашка — Художка.ПРО</title>
+    <style>
+        :root {
+            --pink: #FF6B9D;
+            --purple: #9B59B6;
+            --blue: #4ECDC4;
+            --yellow: #F1C40F;
+            --orange: #FF8C42;
+            --green: #2ECC71;
+            --bg: #FFF5F8;
+            --text: #2C3E50;
+            --hint: #999999;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            color: var(--text);
+        }
+        
+        /* ========== ШАПКА ========== */
+        .hero {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            padding: 24px 20px 32px;
+            border-radius: 0 0 30px 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: '🎨';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 160px;
+            opacity: 0.15;
+        }
+        
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+        
+        .balance {
+            background: rgba(255,255,255,0.25);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            line-height: 1.15;
+        }
+        
+        .hero-sub {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* ========== БЛОК ТЕМЫ ДНЯ ========== */
+        .section {
+            padding: 16px 20px;
+        }
+        
+        .theme-card {
+            background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
+            border: 2px dashed var(--pink);
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .theme-label {
+            font-size: 12px;
+            color: var(--pink);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .theme-emoji {
+            font-size: 56px;
+            margin-bottom: 8px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+        
+        .theme-name {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+        
+        .theme-hint {
+            font-size: 13px;
+            color: var(--hint);
+            margin-bottom: 16px;
+        }
+        
+        .theme-btn {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s;
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(255,107,157,0.3);
+        }
+        
+        .theme-btn:active {
+            transform: scale(0.97);
+        }
+        
+        /* ========== БЛОК КВЕСТА ========== */
+        .quest-card {
+            background: linear-gradient(135deg, #4ECDC4, #2ECC71);
+            color: white;
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .quest-card:active {
+            transform: scale(0.98);
+        }
+        
+        .quest-icon {
+            font-size: 42px;
+            flex-shrink: 0;
+        }
+        
+        .quest-info {
+            flex: 1;
+        }
+        
+        .quest-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .quest-desc {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        /* ========== ДОСТИЖЕНИЯ ========== */
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .achievements {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .achievement {
+            min-width: 90px;
+            background: white;
+            border-radius: 16px;
+            padding: 14px 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .achievement-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 8px;
+            box-shadow: 0 4px 12px rgba(255,165,0,0.3);
+        }
+        
+        .achievement-icon.locked {
+            background: #eee;
+            opacity: 0.5;
+            box-shadow: none;
+        }
+        
+        .achievement-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        /* ========== СТАТИСТИКА ========== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .stat {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--purple);
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: var(--hint);
+            margin-top: 2px;
+        }
+        
+        /* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 20px;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            color: var(--hint);
+            text-decoration: none;
+            font-size: 11px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        
+        .nav-item.active {
+            color: var(--pink);
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ШАПКА -->
+    <div class="hero">
+        <div class="hero-top">
+            <div class="logo">🎨 Рисовашка</div>
+            <div class="balance">🪙 <span id="balance">0</span></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-title">Рисуй каждый день</div>
+            <div class="hero-sub">Зарабатывай баллы и получай подарки</div>
+        </div>
+    </div>
+    
+    <!-- ТЕМА ДНЯ -->
+    <div class="section">
+        <div class="theme-card">
+            <div class="theme-label">📅 Тема дня</div>
+            <div class="theme-emoji" id="themeEmoji">🎨</div>
+            <div class="theme-name" id="themeName">Загрузка...</div>
+            <div class="theme-hint" id="themeHint"></div>
+            <button class="theme-btn" onclick="startDrawing()">
+                ✏️ Начать рисовать
+            </button>
+        </div>
+    </div>
+    
+    <!-- КВЕСТ -->
+    <div class="section">
+        <div class="quest-card" onclick="location.href='quiz/index.html'">
+            <div class="quest-icon">🎯</div>
+            <div class="quest-info">
+                <div class="quest-title">Узнай свой архетип</div>
+                <div class="quest-desc">Пройди квест → получи +50 баллов</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- СТАТИСТИКА -->
+    <div class="section">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="drawingsCount">0</div>
+                <div class="stat-label">Рисунков</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="streakCount">0</div>
+                <div class="stat-label">Дней подряд</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="achievementsCount">0</div>
+                <div class="stat-label">Награды</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ДОСТИЖЕНИЯ -->
+    <div class="section">
+        <div class="section-title">🏆 Мои награды</div>
+        <div class="achievements" id="achievementsList">
+            <!-- Заполняется через JS -->
+        </div>
+    </div>
+    
+    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <span class="nav-icon">🏠</span>
+            <span>Главная</span>
+        </a>
+        <a href="draw/index.html" class="nav-item">
+            <span class="nav-icon">✏️</span>
+            <span>Рисовать</span>
+        </a>
+        <a href="quiz/index.html" class="nav-item">
+            <span class="nav-icon">🎯</span>
+            <span>Квест</span>
+        </a>
+        <a href="rewards/index.html" class="nav-item">
+            <span class="nav-icon">🎁</span>
+            <span>Награды</span>
+        </a>
+        <a href="profile/index.html" class="nav-item">
+            <span class="nav-icon">👤</span>
+            <span>Профиль</span>
+        </a>
+    </div>
+    
+    <!-- ДАННЫЕ -->
+    <script src="shared/data/themes.js"></script>
+    <script src="shared/data/archetypes.js"></script>
+    <script src="shared/data/courses.js"></script>
+    <script src="shared/data/quiz.js"></script>
+    
+    <!-- ЛОГИКА -->
+    <script>
+        // ========== TELEGRAM ==========
+        let tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.setHeaderColor('#FF6B9D');
+            tg.setBackgroundColor('#FFF5F8');
+        }
+        
+        // ========== СОСТОЯНИЕ ==========
+        function getState() {
+            return {
+                balance: parseInt(localStorage.getItem('balance') || '0'),
+                drawings: JSON.parse(localStorage.getItem('drawings') || '[]'),
+                achievements: JSON.parse(localStorage.getItem('achievements') || '[]'),
+                streak: parseInt(localStorage.getItem('streak') || '0'),
+                lastDrawDate: localStorage.getItem('lastDrawDate') || '',
+                archetype: localStorage.getItem('archetype') || null
+            };
+        }
+        
+        function saveState(key, value) {
+            if (typeof value === 'object') {
+                localStorage.setItem(key, JSON.stringify(value));
+            } else {
+                localStorage.setItem(key, value);
+            }
+        }
+        
+        // ========== ТЕМА ДНЯ ==========
+        function loadTodayTheme() {
+            const theme = getTodayTheme();
+            document.getElementById('themeEmoji').textContent = theme.emoji;
+            document.getElementById('themeName').textContent = theme.text;
+            document.getElementById('themeHint').textContent = theme.hint;
+        }
+        
+        // ========== БАЛАНС ==========
+        function updateBalance() {
+            const state = getState();
+            document.getElementById('balance').textContent = state.balance;
+            document.getElementById('drawingsCount').textContent = state.drawings.length;
+            document.getElementById('streakCount').textContent = state.streak;
+            document.getElementById('achievementsCount').textContent = state.achievements.length;
+        }
+        
+        // ========== ДОСТИЖЕНИЯ ==========
+        const ALL_ACHIEVEMENTS = [
+            { id: 'first-draw', name: 'Первый рисунок', icon: '🎨', condition: (s) => s.drawings.length >= 1 },
+            { id: 'five-draw', name: '5 рисунков', icon: '⭐️', condition: (s) => s.drawings.length >= 5 },
+            { id: 'ten-draw', name: '10 рисунков', icon: '🔥', condition: (s) => s.drawings.length >= 10 },
+            { id: 'streak-3', name: '3 дня подряд', icon: '📅', condition: (s) => s.streak >= 3 },
+            { id: 'streak-7', name: 'Неделя', icon: '💪', condition: (s) => s.streak >= 7 },
+            { id: 'quiz-done', name: 'Архетип', icon: '🎯', condition: (s) => s.archetype !== null }
+        ];
+        
+        function renderAchievements() {
+            const state = getState();
+            const container = document.getElementById('achievementsList');
+            
+            container.innerHTML = ALL_ACHIEVEMENTS.map(a => {
+                const unlocked = a.condition(state);
+                return `
+                    <div class="achievement">
+                        <div class="achievement-icon ${unlocked ? '' : 'locked'}">${a.icon}</div>
+                        <div class="achievement-name">${a.name}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ========== ДЕЙСТВИЯ ==========
+        function startDrawing() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            location.href = 'draw/index.html';
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        loadTodayTheme();
+        updateBalance();
+        renderAchievements();
+        
+        console.log('🎨 Рисовашка запущена');
+    </script>
+</body>
+</html>

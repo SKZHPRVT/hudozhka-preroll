@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="telegram-web-app-capable" content="yes">
+    <title>Профиль — Рисовашка</title>
+    <style>
+        :root { --pink: #FF6B9D; --purple: #9B59B6; --bg: #FFF5F8; --text: #2C3E50; --hint: #999999; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 80px; color: var(--text); }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            padding: 30px 20px 40px;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 20px;
+        }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 48px; margin: 0 auto 14px; }
+        .user-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+        .user-archetype { font-size: 14px; opacity: 0.9; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 20px; margin-bottom: 20px; }
+        .stat { background: white; border-radius: 16px; padding: 16px 8px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .stat-value { font-size: 24px; font-weight: 800; color: var(--purple); }
+        .stat-label { font-size: 11px; color: var(--hint); margin-top: 2px; }
+        
+        .section { padding: 0 20px; margin-bottom: 20px; }
+        .section-title { font-size: 17px; font-weight: 800; margin-bottom: 12px; }
+        
+        .menu-item { background: white; border-radius: 14px; padding: 16px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); cursor: pointer; text-decoration: none; color: inherit; }
+        .menu-icon { font-size: 24px; }
+        .menu-text { flex: 1; font-size: 14px; font-weight: 600; }
+        .menu-arrow { color: var(--hint); }
+        
+        .drawings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .drawing-thumb { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .drawing-thumb img { width: 100%; height: 100px; object-fit: cover; display: block; }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--hint); }
+        .empty-emoji { font-size: 60px; margin-bottom: 12px; }
+        
+        .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; padding: 8px 0 20px; z-index: 100; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--hint); text-decoration: none; font-size: 11px; }
+        .nav-item.active { color: var(--pink); }
+        .nav-icon { font-size: 24px; margin-bottom: 2px; }
+    </style>
+</head>
+<body>
+    <div class="profile-header">
+        <div class="avatar">🎨</div>
+        <div class="user-name" id="userName">Художник</div>
+        <div class="user-archetype" id="userArchetype">Архетип не определён</div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat"><div class="stat-value" id="statBalance">0</div><div class="stat-label">Баллов</div></div>
+        <div class="stat"><div class="stat-value" id="statDrawings">0</div><div class="stat-label">Рисунков</div></div>
+        <div class="stat"><div class="stat-value" id="statStreak">0</div><div class="stat-label">Дней</div></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">🖼 Мои рисунки</div>
+        <div class="drawings-grid" id="drawingsGrid"></div>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">⚙️ Меню</div>
+        <a href="../quiz/index.html" class="menu-item">
+            <span class="menu-icon">🎯</span>
+            <span class="menu-text">Пройти квест заново</span>
+            <span class="menu-arrow">→</span>
+        </a>
+        <a href="../rewards/index.html" class="menu-item">
+            <span class="menu-icon">🎁</span>
+            <span class="menu-text">Мои награды</span>
+            <span class="menu-arrow">→</span>
+        </a>
+        <a href="tel:+79155622202" class="menu-item">
+            <span class="menu-icon">📞</span>
+            <span class="menu-text">Позвонить в школу</span>
+            <span class="menu-arrow">→</span>
+        </a>
+        <a href="https://yandex.ru/maps/?text=Белгород, Архиерейская, 4" target="_blank" class="menu-item">
+            <span class="menu-icon">📍</span>
+            <span class="menu-text">Как нас найти</span>
+            <span class="menu-arrow">→</span>
+        </a>
+    </div>
+    
+    <div class="bottom-nav">
+        <a href="../index.html" class="nav-item"><span class="nav-icon">🏠</span><span>Главная</span></a>
+        <a href="../draw/index.html" class="nav-item"><span class="nav-icon">✏️</span><span>Рисовать</span></a>
+        <a href="../quiz/index.html" class="nav-item"><span class="nav-icon">🎯</span><span>Квест</span></a>
+        <a href="../rewards/index.html" class="nav-item"><span class="nav-icon">🎁</span><span>Награды</span></a>
+        <a href="index.html" class="nav-item active"><span class="nav-icon">👤</span><span>Профиль</span></a>
+    </div>
+    
+    <script src="../shared/data/archetypes.js"></script>
+    <script>
+        let tg = window.Telegram?.WebApp;
+        if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#FF6B9D'); }
+        
+        // Имя из Telegram
+        const user = tg?.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('userName').textContent = user.first_name || 'Художник';
+        }
+        
+        // Данные
+        const balance = parseInt(localStorage.getItem('balance') || '0');
+        const drawings = JSON.parse(localStorage.getItem('drawings') || '[]');
+        const streak = parseInt(localStorage.getItem('streak') || '0');
+        const archetypeId = localStorage.getItem('archetype');
+        
+        document.getElementById('statBalance').textContent = balance;
+        document.getElementById('statDrawings').textContent = drawings.length;
+        document.getElementById('statStreak').textContent = streak;
+        
+        if (archetypeId && ARCHETYPES[archetypeId]) {
+            const arch = ARCHETYPES[archetypeId];
+            document.getElementById('userArchetype').textContent = `${arch.emoji} ${arch.name}`;
+        }
+        
+        // Рисунки
+        const grid = document.getElementById('drawingsGrid');
+        if (drawings.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state" style="grid-column: 1/-1;">
+                    <div class="empty-emoji">🎨</div>
+                    <div>Пока нет рисунков</div>
+                    <div style="font-size: 13px; margin-top: 6px;">Начни рисовать прямо сейчас!</div>
+                </div>
+            `;
+        } else {
+            grid.innerHTML = drawings.slice(-9).reverse().map(d => `
+                <div class="drawing-thumb">
+                    <img src="${d.image}" alt="${d.theme}">
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="telegram-web-app-capable" content="yes">
+    <title>Рисуем — Рисовашка</title>
+    <style>
+        :root {
+            --pink: #FF6B9D;
+            --purple: #9B59B6;
+            --blue: #4ECDC4;
+            --bg: #FFF5F8;
+            --text: #2C3E50;
+            --hint: #999999;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: var(--text);
+            touch-action: none;
+        }
+        
+        /* ========== ШАПКА ========== */
+        .top-bar {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .top-bar-info {
+            flex: 1;
+        }
+        
+        .theme-label {
+            font-size: 11px;
+            opacity: 0.85;
+            margin-bottom: 2px;
+        }
+        
+        .theme-text {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        
+        .hint-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        /* ========== ХОЛСТ ========== */
+        .canvas-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            position: relative;
+            min-height: 0;
+        }
+        
+        #drawingCanvas {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            touch-action: none;
+            cursor: crosshair;
+            max-width: 100%;
+            max-height: 100%;
+        }
+        
+        .hint-bubble {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.75);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 5;
+        }
+        
+        .hint-bubble.show {
+            opacity: 1;
+        }
+        
+        /* ========== ИНСТРУМЕНТЫ ========== */
+        .tools {
+            background: white;
+            border-top: 1px solid #eee;
+            padding: 10px 12px 16px;
+            flex-shrink: 0;
+        }
+        
+        .brushes-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .brush-btn {
+            min-width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            background: #F5F5F5;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .brush-btn.active {
+            border-color: var(--pink);
+            background: #FFE5F0;
+            transform: scale(1.05);
+        }
+        
+        .brush-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .colors-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .color-btn {
+            min-width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .color-btn.active {
+            transform: scale(1.25);
+            box-shadow: 0 0 0 2px var(--pink), 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .actions-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.96);
+        }
+        
+        .btn-undo {
+            background: #F0F0F0;
+            color: var(--text);
+        }
+        
+        .btn-clear {
+            background: #FFE5E5;
+            color: #FF4444;
+        }
+        
+        .btn-done {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            box-shadow: 0 4px 12px rgba(255,107,157,0.3);
+        }
+        
+        /* ========== ФИНАЛЬНОЕ МОДАЛЬНОЕ ОКНО ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal.open {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+        
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal-emoji {
+            font-size: 64px;
+            margin-bottom: 12px;
+        }
+        
+        .modal-title {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .modal-sub {
+            font-size: 14px;
+            color: var(--hint);
+            margin-bottom: 20px;
+        }
+        
+        .points-earned {
+            background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .points-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--pink);
+        }
+        
+        .points-label {
+            font-size: 13px;
+            color: var(--hint);
+        }
+        
+        .modal-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+        
+        .modal-btn-secondary {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            color: var(--hint);
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- ШАПКА -->
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div class="top-bar-info">
+            <div class="theme-label">📅 Тема дня</div>
+            <div class="theme-text" id="themeText">Загрузка...</div>
+        </div>
+        <button class="hint-btn" onclick="showHint()">💡</button>
+    </div>
+    
+    <!-- ХОЛСТ -->
+    <div class="canvas-wrapper">
+        <canvas id="drawingCanvas"></canvas>
+        <div class="hint-bubble" id="hintBubble"></div>
+    </div>
+    
+    <!-- ИНСТРУМЕНТЫ -->
+    <div class="tools">
+        <div class="brushes-row" id="brushesRow"></div>
+        <div class="colors-row" id="colorsRow"></div>
+        <div class="actions-row">
+            <button class="action-btn btn-undo" onclick="undo()">↶ Отмена</button>
+            <button class="action-btn btn-clear" onclick="clearCanvas()">🗑 Очистить</button>
+            <button class="action-btn btn-done" onclick="finishDrawing()">✓ Готово</button>
+        </div>
+    </div>
+    
+    <!-- МОДАЛЬНОЕ ОКНО -->
+    <div class="modal" id="successModal">
+        <div class="modal-content">
+            <div class="modal-emoji">🎉</div>
+            <div class="modal-title">Отличная работа!</div>
+            <div class="modal-sub">Ты нарисовал(а) рисунок дня</div>
+            <div class="points-earned">
+                <div class="points-value">+10</div>
+                <div class="points-label">баллов</div>
+            </div>
+            <button class="modal-btn" onclick="location.href='../index.html'">
+                На главную
+            </button>
+            <button class="modal-btn-secondary" onclick="continueDrawing()">
+                Нарисовать ещё
+            </button>
+        </div>
+    </div>
+    
+    <!-- ДАННЫЕ -->
+    <script src="../shared/data/themes.js"></script>
+    
+    <!-- ЛОГИКА РИСОВАНИЯ -->
+    <script>
+        // ========== TELEGRAM ==========
+        let tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.setHeaderColor('#FF6B9D');
+            tg.setBackgroundColor('#FFF5F8');
+            if (tg.disableVerticalSwipes) tg.disableVerticalSwipes();
+        }
+        
+        function goBack() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            location.href = '../index.html';
+        }
+        
+        // ========== ТЕМА ДНЯ ==========
+        const todayTheme = getTodayTheme();
+        document.getElementById('themeText').textContent = todayTheme.emoji + ' ' + todayTheme.text;
+        
+        function showHint() {
+            const bubble = document.getElementById('hintBubble');
+            bubble.textContent = '💡 ' + todayTheme.hint;
+            bubble.classList.add('show');
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            setTimeout(() => bubble.classList.remove('show'), 3000);
+        }
+        
+        // ========== CANVAS ==========
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Настройки
+        const colors = [
+            '#000000', '#FFFFFF', '#FF0000', '#FF6B00', '#FFD700',
+            '#4CAF50', '#00BCD4', '#2196F3', '#3F51B5', '#9C27B0',
+            '#E91E63', '#795548', '#607D8B', '#8B4513', '#FFB6C1'
+        ];
+        
+        const brushes = [
+            { id: 'pencil', name: 'Карандаш', icon: '✏️', size: 2, opacity: 1, color: '#333' },
+            { id: 'marker', name: 'Маркер', icon: '🖊', size: 8, opacity: 0.9, color: null },
+            { id: 'brush', name: 'Кисть', icon: '🖌', size: 16, opacity: 0.7, color: null },
+            { id: 'watercolor', name: 'Акварель', icon: '🎨', size: 24, opacity: 0.4, color: null },
+            { id: 'eraser', name: 'Ластик', icon: '🧽', size: 24, opacity: 1, color: '#FFFFFF' }
+        ];
+        
+        let currentColor = '#000000';
+        let currentBrush = brushes[0];
+        let isDrawing = false;
+        let history = [];
+        let maxHistory = 20;
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ CANVAS ==========
+        function initCanvas() {
+            // Размер canvas = размер wrapper
+            const wrapper = canvas.parentElement;
+            const rect = wrapper.getBoundingClientRect();
+            
+            // Соотношение сторон 1:1 для квадратного холста
+            const size = Math.min(rect.width - 20, rect.height - 20);
+            
+            // Учитываем devicePixelRatio для четкости
+            const dpr = window.devicePixelRatio || 1;
+            
+            canvas.style.width = size + 'px';
+            canvas.style.height = size + 'px';
+            canvas.width = size * dpr;
+            canvas.height = size * dpr;
+            
+            ctx.scale(dpr, dpr);
+            
+            // Белый фон
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Начальный цвет карандаша
+            ctx.strokeStyle = currentColor;
+            ctx.lineWidth = currentBrush.size;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.globalAlpha = currentBrush.opacity;
+        }
+        
+        // ========== РИСОВАНИЕ ==========
+        function getPosition(e) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+            
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+            
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+        
+        function startDrawing(e) {
+            e.preventDefault();
+            isDrawing = true;
+            
+            // Сохраняем состояние для undo
+            saveHistory();
+            
+            const pos = getPosition(e);
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
+            
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+        
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            
+            const pos = getPosition(e);
+            ctx.lineTo(pos.x, pos.y);
+            ctx.stroke();
+        }
+        
+        function stopDrawing(e) {
+            if (!isDrawing) return;
+            isDrawing = false;
+            ctx.closePath();
+        }
+        
+        // Подписки
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
+        
+        canvas.addEventListener('touchstart', startDrawing, { passive: false });
+        canvas.addEventListener('touchmove', draw, { passive: false });
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
+        
+        // ========== ИСТОРИЯ (UNDO) ==========
+        function saveHistory() {
+            const dpr = window.devicePixelRatio || 1;
+            const size = canvas.width;
+            
+            const imageData = ctx.getImageData(0, 0, size, size);
+            history.push(imageData);
+            
+            if (history.length > maxHistory) {
+                history.shift();
+            }
+        }
+        
+        function undo() {
+            if (history.length === 0) return;
+            
+            const imageData = history.pop();
+            ctx.putImageData(imageData, 0, 0);
+            
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+        
+        function clearCanvas() {
+            if (!confirm('Очистить рисунок?')) return;
+            
+            saveHistory();
+            
+            const dpr = window.devicePixelRatio || 1;
+            const size = canvas.width / dpr;
+            
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, size, size);
+            
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+        
+        // ========== ИНСТРУМЕНТЫ ==========
+        function renderBrushes() {
+            const container = document.getElementById('brushesRow');
+            
+            container.innerHTML = brushes.map(b => `
+                <button class="brush-btn ${b.id === currentBrush.id ? 'active' : ''}" 
+                        onclick="selectBrush('${b.id}')"
+                        title="${b.name}">
+                    ${b.icon}
+                </button>
+            `).join('');
+        }
+        
+        function selectBrush(id) {
+            currentBrush = brushes.find(b => b.id === id);
+            
+            if (id === 'eraser') {
+                ctx.strokeStyle = '#FFFFFF';
+            } else {
+                ctx.strokeStyle = currentColor;
+            }
+            
+            ctx.lineWidth = currentBrush.size;
+            ctx.globalAlpha = currentBrush.opacity;
+            
+            renderBrushes();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+        
+        function renderColors() {
+            const container = document.getElementById('colorsRow');
+            
+            container.innerHTML = colors.map(c => `
+                <button class="color-btn ${c === currentColor ? 'active' : ''}" 
+                        style="background: ${c}"
+                        onclick="selectColor('${c}')">
+                </button>
+            `).join('');
+        }
+        
+        function selectColor(color) {
+            currentColor = color;
+            
+            if (currentBrush.id !== 'eraser') {
+                ctx.strokeStyle = color;
+            }
+            
+            renderColors();
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+        }
+        
+        // ========== ЗАВЕРШЕНИЕ ==========
+        function finishDrawing() {
+            // Проверяем что что-то нарисовано
+            // Простая проверка: смотрим есть ли не белые пиксели
+            
+            const state = JSON.parse(localStorage.getItem('state') || '{}');
+            const today = new Date().toDateString();
+            const lastDrawDate = localStorage.getItem('lastDrawDate') || '';
+            
+            // Начисляем баллы
+            let balance = parseInt(localStorage.getItem('balance') || '0');
+            let drawings = JSON.parse(localStorage.getItem('drawings') || '[]');
+            let streak = parseInt(localStorage.getItem('streak') || '0');
+            
+            // Проверяем стрик
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            
+            if (lastDrawDate === yesterday.toDateString()) {
+                streak++;
+            } else if (lastDrawDate !== today) {
+                streak = 1;
+            }
+            
+            // Начисляем баллы
+            const pointsEarned = 10;
+            balance += pointsEarned;
+            
+            // Сохраняем рисунок
+            const imageData = canvas.toDataURL('image/png');
+            drawings.push({
+                id: Date.now(),
+                theme: todayTheme.text,
+                date: today,
+                image: imageData
+            });
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('balance', balance);
+            localStorage.setItem('drawings', JSON.stringify(drawings));
+            localStorage.setItem('streak', streak);
+            localStorage.setItem('lastDrawDate', today);
+            
+            // Показываем модальное окно
+            document.getElementById('successModal').classList.add('open');
+            
+            if (tg?.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+        
+        function continueDrawing() {
+            document.getElementById('successModal').classList.remove('open');
+            history = [];
+            clearCanvas();
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        window.addEventListener('load', () => {
+            initCanvas();
+            renderBrushes();
+            renderColors();
+        });
+        
+        window.addEventListener('resize', () => {
+            // Пересчитываем canvas при повороте экрана
+            // (пока просто сбрасываем)
+        });
+        
+        // Показываем подсказку через 1 секунду
+        setTimeout(() => {
+            showHint();
+        }, 1500);
+        
+        console.log('🎨 Холст для рисования готов');
+    </script>
+</body>
+</html>

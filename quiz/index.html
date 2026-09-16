@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="telegram-web-app-capable" content="yes">
+    <title>Квест — Рисовашка</title>
+    <style>
+        :root {
+            --pink: #FF6B9D;
+            --purple: #9B59B6;
+            --blue: #4ECDC4;
+            --green: #2ECC71;
+            --bg: #FFF5F8;
+            --text: #2C3E50;
+            --hint: #999999;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text);
+        }
+        
+        /* ========== ШАПКА ========== */
+        .top-bar {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .top-bar-title {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 700;
+        }
+        
+        .step-counter {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        
+        /* ========== ПРОГРЕСС ========== */
+        .progress-bar {
+            height: 6px;
+            background: #FFE5F0;
+            margin: 0 16px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B9D, #9B59B6);
+            border-radius: 3px;
+            transition: width 0.4s ease;
+            width: 0%;
+        }
+        
+        /* ========== ВОПРОС ========== */
+        .quiz-container {
+            flex: 1;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .question-block {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .question-number {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--pink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .question-title {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 6px;
+        }
+        
+        .question-sub {
+            font-size: 14px;
+            color: var(--hint);
+            margin-bottom: 24px;
+        }
+        
+        /* ========== ВАРИАНТЫ ========== */
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .option {
+            background: white;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .option:active {
+            transform: scale(0.97);
+        }
+        
+        .option.selected {
+            border-color: var(--pink);
+            background: #FFE5F0;
+        }
+        
+        .option-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+        
+        .option-text {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+        }
+        
+        .option-arrow {
+            color: var(--hint);
+            font-size: 18px;
+        }
+        
+        .option.selected .option-arrow {
+            color: var(--pink);
+        }
+        
+        /* ========== РЕЗУЛЬТАТ ========== */
+        .result-screen {
+            display: none;
+            padding: 20px;
+            text-align: center;
+            animation: popIn 0.4s ease-out;
+        }
+        
+        .result-screen.active {
+            display: block;
+        }
+        
+        @keyframes popIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .result-emoji {
+            font-size: 80px;
+            margin-bottom: 16px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .result-label {
+            font-size: 13px;
+            color: var(--pink);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .result-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+        
+        .result-desc {
+            font-size: 15px;
+            color: #555;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            padding: 0 10px;
+        }
+        
+        .strengths {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        
+        .strength-tag {
+            background: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--purple);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        
+        .recommended {
+            background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        
+        .recommended-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--pink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        
+        .course-card {
+            background: white;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .course-card:active {
+            transform: scale(0.98);
+        }
+        
+        .course-emoji {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+        
+        .course-info {
+            flex: 1;
+        }
+        
+        .course-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        
+        .course-meta {
+            font-size: 12px;
+            color: var(--hint);
+        }
+        
+        .diploma-badge {
+            background: #FFF5E0;
+            color: #B8860B;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            margin-top: 4px;
+            display: inline-block;
+        }
+        
+        .points-bonus {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #8B4513;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(255,165,0,0.3);
+        }
+        
+        .result-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(255,107,157,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--hint);
+            border: 2px solid #eee;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* ========== СКРЫТЫЕ ЭЛЕМЕНТЫ ========== */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- ШАПКА -->
+    <div class="top-bar">
+        <button class="back-btn" onclick="goBack()">←</button>
+        <div class="top-bar-title">🎯 Квест: Твой архетип</div>
+        <div class="step-counter" id="stepCounter">1/7</div>
+    </div>
+    
+    <!-- ПРОГРЕСС -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
+    <div class="quiz-container">
+        <!-- ВОПРОС -->
+        <div class="question-block" id="questionBlock">
+            <div class="question-number" id="questionNumber">Вопрос 1</div>
+            <div class="question-title" id="questionTitle">Загрузка...</div>
+            <div class="question-sub" id="questionSub"></div>
+            <div class="options" id="optionsList"></div>
+        </div>
+        
+        <!-- РЕЗУЛЬТАТ -->
+        <div class="result-screen" id="resultScreen">
+            <div class="result-emoji" id="resultEmoji">🎨</div>
+            <div class="result-label">Твой архетип</div>
+            <div class="result-title" id="resultTitle">Реалист</div>
+            <div class="result-desc" id="resultDesc"></div>
+            
+            <div class="strengths" id="resultStrengths"></div>
+            
+            <div class="recommended">
+                <div class="recommended-label">🎯 Рекомендуем курсы</div>
+                <div id="recommendedCourses"></div>
+            </div>
+            
+            <div class="points-bonus">
+                🎁 +50 баллов за прохождение!
+            </div>
+            
+            <div class="result-actions">
+                <button class="btn-primary" onclick="bookTrial()">
+                    📅 Записаться на пробное
+                </button>
+                <button class="btn-secondary" onclick="restartQuiz()">
+                    🔄 Пройти заново
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ДАННЫЕ -->
+    <script src="../shared/data/quiz.js"></script>
+    <script src="../shared/data/archetypes.js"></script>
+    <script src="../shared/data/courses.js"></script>
+    
+    <!-- ЛОГИКА -->
+    <script>
+        // ========== TELEGRAM ==========
+        let tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.setHeaderColor('#FF6B9D');
+            tg.setBackgroundColor('#FFF5F8');
+        }
+        
+        function goBack() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            if (currentStep > 0 && !showingResult) {
+                if (confirm('Выйти из квеста? Прогресс не сохранится.')) {
+                    location.href = '../index.html';
+                }
+            } else {
+                location.href = '../index.html';
+            }
+        }
+        
+        // ========== СОСТОЯНИЕ ==========
+        let currentStep = 0;
+        let answers = [];
+        let showingResult = false;
+        let selectedOption = null;
+        
+        // ========== ОТОБРАЖЕНИЕ ВОПРОСА ==========
+        function renderQuestion() {
+            if (currentStep >= QUIZ_QUESTIONS.length) {
+                showResult();
+                return;
+            }
+            
+            const q = QUIZ_QUESTIONS[currentStep];
+            selectedOption = null;
+            
+            // Обновляем шапку
+            document.getElementById('stepCounter').textContent = `${currentStep + 1}/${QUIZ_QUESTIONS.length}`;
+            document.getElementById('progressFill').style.width = `${(currentStep / QUIZ_QUESTIONS.length) * 100}%`;
+            
+            // Обновляем вопрос
+            document.getElementById('questionNumber').textContent = `Вопрос ${currentStep + 1}`;
+            document.getElementById('questionTitle').textContent = q.text;
+            document.getElementById('questionSub').textContent = q.subtitle || '';
+            
+            // Рендерим варианты
+            const container = document.getElementById('optionsList');
+            container.innerHTML = q.options.map((opt, idx) => `
+                <div class="option" onclick="selectOption(${idx}, '${opt.value}')">
+                    <span class="option-icon">${opt.icon}</span>
+                    <span class="option-text">${opt.text}</span>
+                    <span class="option-arrow">→</span>
+                </div>
+            `).join('');
+            
+            // Перезапускаем анимацию
+            const block = document.getElementById('questionBlock');
+            block.style.animation = 'none';
+            setTimeout(() => {
+                block.style.animation = 'slideIn 0.3s ease-out';
+            }, 10);
+        }
+        
+        function selectOption(index, value) {
+            if (selectedOption !== null) return;
+            selectedOption = index;
+            
+            // Визуальный отклик
+            const options = document.querySelectorAll('.option');
+            options[index].classList.add('selected');
+            
+            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            
+            // Сохраняем ответ
+            answers.push(value);
+            
+            // Переход к следующему вопросу
+            setTimeout(() => {
+                currentStep++;
+                renderQuestion();
+            }, 400);
+        }
+        
+        // ========== РЕЗУЛЬТАТ ==========
+        function showResult() {
+            showingResult = true;
+            document.getElementById('progressFill').style.width = '100%';
+            document.getElementById('questionBlock').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            // Определяем архетип
+            const archetypeId = calculateArchetype(answers);
+            const archetype = ARCHETYPES[archetypeId];
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('archetype', archetypeId);
+            
+            // Начисляем баллы (однократно)
+            if (!localStorage.getItem('quizCompleted')) {
+                let balance = parseInt(localStorage.getItem('balance') || '0');
+                balance += 50;
+                localStorage.setItem('balance', balance);
+                localStorage.setItem('quizCompleted', 'true');
+            }
+            
+            // Отображаем результат
+            document.getElementById('resultEmoji').textContent = archetype.emoji;
+            document.getElementById('resultTitle').textContent = archetype.name;
+            document.getElementById('resultTitle').style.color = archetype.color;
+            document.getElementById('resultDesc').textContent = archetype.description;
+            
+            // Сильные стороны
+            document.getElementById('resultStrengths').innerHTML = archetype.strengths
+                .map(s => `<span class="strength-tag">✨ ${s}</span>`)
+                .join('');
+            
+            // Рекомендуемые курсы
+            const coursesContainer = document.getElementById('recommendedCourses');
+            coursesContainer.innerHTML = archetype.recommendedCourses
+                .map(courseId => {
+                    const course = COURSES[courseId];
+                    if (!course) return '';
+                    return `
+                        <div class="course-card" onclick="openCourse('${courseId}')">
+                            <span class="course-emoji">${course.emoji}</span>
+                            <div class="course-info">
+                                <div class="course-name">${course.name}</div>
+                                <div class="course-meta">${course.duration} • ${course.age}</div>
+                                ${course.hasDiploma ? '<span class="diploma-badge">📜 Диплом гособразца</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+            
+            if (tg?.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+            }
+        }
+        
+        // ========== ДЕЙСТВИЯ ==========
+        function openCourse(courseId) {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            // Пока просто алерт, потом сделаем страницу курса
+            const course = COURSES[courseId];
+            alert(`📚 ${course.name}\n\n${course.description}\n\n⏱ ${course.duration}\n👶 ${course.age}\n💰 ${course.price} ₽`);
+        }
+        
+        function bookTrial() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            
+            if (tg) {
+                tg.sendData(JSON.stringify({
+                    action: 'book_trial',
+                    archetype: localStorage.getItem('archetype'),
+                    timestamp: Date.now()
+                }));
+            }
+            
+            alert('✅ Заявка отправлена!\n\nАдминистратор свяжется с вами для записи на пробное занятие.');
+        }
+        
+        function restartQuiz() {
+            currentStep = 0;
+            answers = [];
+            showingResult = false;
+            
+            document.getElementById('questionBlock').classList.remove('hidden');
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('progressFill').style.width = '0%';
+            
+            renderQuestion();
+        }
+        
+        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        renderQuestion();
+        
+        console.log('🎯 Квест запущен');
+    </script>
+</body>
+</html>
