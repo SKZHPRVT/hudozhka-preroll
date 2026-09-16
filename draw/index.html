@@ -34,10 +34,10 @@
         .top-bar {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
-            padding: 10px 14px;
+            padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             flex-shrink: 0;
         }
         
@@ -58,14 +58,10 @@
         
         .top-bar-info { flex: 1; min-width: 0; }
         
-        .theme-label {
-            font-size: 10px;
-            opacity: 0.85;
-            margin-bottom: 2px;
-        }
+        .theme-label { font-size: 10px; opacity: 0.85; margin-bottom: 2px; }
         
         .theme-text {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
@@ -81,13 +77,13 @@
             padding: 8px;
             position: relative;
             min-height: 0;
-            background: #F0F0F0;
+            background: #E8E8E8;
         }
         
         #drawingCanvas {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             touch-action: none;
             cursor: crosshair;
             max-width: 100%;
@@ -109,7 +105,8 @@
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 5;
-            white-space: nowrap;
+            max-width: 90%;
+            text-align: center;
         }
         
         .hint-bubble.show { opacity: 1; }
@@ -120,10 +117,9 @@
             border-top: 1px solid #eee;
             padding: 8px 10px 12px;
             flex-shrink: 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
         }
         
-        /* Верхняя строка — размер и отмена */
+        /* Размер + быстрые действия */
         .tools-top {
             display: flex;
             align-items: center;
@@ -142,19 +138,13 @@
         }
         
         .size-preview {
-            width: 20px;
-            height: 20px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: currentColor;
             flex-shrink: 0;
             transition: all 0.15s;
         }
-        
-        .size-preview[data-size="1"] { width: 4px; height: 4px; }
-        .size-preview[data-size="2"] { width: 8px; height: 8px; }
-        .size-preview[data-size="3"] { width: 14px; height: 14px; }
-        .size-preview[data-size="4"] { width: 22px; height: 22px; }
-        .size-preview[data-size="5"] { width: 30px; height: 30px; }
         
         #sizeSlider {
             flex: 1;
@@ -184,8 +174,24 @@
             border-radius: 50%;
             cursor: pointer;
             border: none;
-            box-shadow: 0 2px 6px rgba(255,107,157,0.4);
         }
+        
+        .quick-btn {
+            background: #F5F5F5;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+        
+        .quick-btn:active { transform: scale(0.9); }
         
         /* Кисти */
         .brushes-row {
@@ -194,6 +200,7 @@
             overflow-x: auto;
             padding-bottom: 8px;
             -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
         
         .brushes-row::-webkit-scrollbar { display: none; }
@@ -211,7 +218,6 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            position: relative;
         }
         
         .brush-btn.active {
@@ -220,9 +226,7 @@
             transform: scale(1.05);
         }
         
-        .brush-btn:active {
-            transform: scale(0.92);
-        }
+        .brush-btn:active { transform: scale(0.92); }
         
         /* Цвета */
         .colors-row {
@@ -232,6 +236,7 @@
             padding-bottom: 8px;
             -webkit-overflow-scrolling: touch;
             align-items: center;
+            scrollbar-width: none;
         }
         
         .colors-row::-webkit-scrollbar { display: none; }
@@ -277,7 +282,7 @@
             cursor: pointer;
         }
         
-        /* Кнопки действий */
+        /* Действия */
         .actions-row {
             display: grid;
             grid-template-columns: 1fr 1fr 1.5fr;
@@ -299,27 +304,17 @@
             gap: 4px;
         }
         
-        .action-btn:active {
-            transform: scale(0.96);
-        }
+        .action-btn:active { transform: scale(0.96); }
         
-        .btn-undo {
-            background: #F0F0F0;
-            color: var(--text);
-        }
-        
-        .btn-clear {
-            background: #FFE5E5;
-            color: #FF4444;
-        }
-        
+        .btn-undo { background: #F0F0F0; color: var(--text); }
+        .btn-clear { background: #FFE5E5; color: #FF4444; }
         .btn-done {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
             box-shadow: 0 4px 12px rgba(255,107,157,0.3);
         }
         
-        /* ========== МОДАЛЬНОЕ ОКНО ФИНАЛА ========== */
+        /* ========== МОДАЛКИ ========== */
         .modal {
             display: none;
             position: fixed;
@@ -334,9 +329,7 @@
             padding: 20px;
         }
         
-        .modal.open {
-            display: flex;
-        }
+        .modal.open { display: flex; }
         
         .modal-content {
             background: white;
@@ -389,10 +382,7 @@
             color: var(--pink);
         }
         
-        .points-label {
-            font-size: 13px;
-            color: var(--hint);
-        }
+        .points-label { font-size: 13px; color: var(--hint); }
         
         .modal-btn {
             width: 100%;
@@ -411,9 +401,7 @@
             gap: 6px;
         }
         
-        .modal-btn:active {
-            transform: scale(0.97);
-        }
+        .modal-btn:active { transform: scale(0.97); }
         
         .modal-btn-outline {
             background: transparent;
@@ -430,19 +418,6 @@
             font-size: 13px;
             cursor: pointer;
         }
-        
-        .submitted-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: #E8F5E9;
-            color: #4CAF50;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-top: 8px;
-        }
     </style>
 </head>
 <body>
@@ -453,8 +428,7 @@
             <div class="theme-label">📅 Тема дня</div>
             <div class="theme-text" id="themeText">Загрузка...</div>
         </div>
-        <button class="icon-btn" onclick="showHint()">💡</button>
-        <button class="icon-btn" onclick="toggleFullscreen()">⛶</button>
+        <button class="icon-btn" onclick="showHint()" title="Подсказка">💡</button>
     </div>
     
     <!-- ХОЛСТ -->
@@ -465,12 +439,14 @@
     
     <!-- ИНСТРУМЕНТЫ -->
     <div class="tools">
-        <!-- Размер кисти -->
+        <!-- Размер + загрузка/сохранение -->
         <div class="tools-top">
             <div class="size-slider">
-                <div class="size-preview" id="sizePreview" data-size="2"></div>
+                <div class="size-preview" id="sizePreview"></div>
                 <input type="range" id="sizeSlider" min="1" max="5" value="2" step="1">
             </div>
+            <button class="quick-btn" onclick="loadImage()" title="Загрузить картинку">📁</button>
+            <button class="quick-btn" onclick="saveImage()" title="Сохранить">💾</button>
         </div>
         
         <!-- Кисти -->
@@ -487,23 +463,25 @@
         </div>
     </div>
     
-    <!-- МОДАЛЬНОЕ ОКНО -->
+    <!-- МОДАЛКА ФИНАЛА -->
     <div class="modal" id="successModal">
         <div class="modal-content">
             <div class="modal-emoji">🎉</div>
             <div class="modal-title">Отличный рисунок!</div>
-            <div class="modal-sub" id="modalSub">Ты нарисовал(а) «Осенний лист»</div>
+            <div class="modal-sub" id="modalSub">Ты нарисовал(а) рисунок дня</div>
             <div class="points-earned">
                 <div class="points-value">+10</div>
                 <div class="points-label">баллов</div>
             </div>
             
-            <button class="modal-btn" onclick="submitToTeacher()">
-                📤 Отправить преподавателю
+            <button class="modal-btn" onclick="saveImage()">
+                💾 Сохранить на телефон
             </button>
+            
             <button class="modal-btn modal-btn-outline" onclick="location.href='../index.html'">
                 🏠 На главную
             </button>
+            
             <button class="modal-btn-secondary" onclick="continueDrawing()">
                 ✏️ Нарисовать ещё
             </button>
@@ -545,20 +523,136 @@
             setTimeout(() => bubble.classList.remove('show'), 3000);
         }
         
-        // ========== КИСТИ ==========
+        // ========== КИСТИ С РЕАЛЬНО РАЗНОЙ ТЕКСТУРОЙ ==========
         const BRUSHES = [
-            { id: 'pencil', name: 'Карандаш', icon: '✏️', baseSize: 2, opacity: 1, texture: 'sharp' },
-            { id: 'pen', name: 'Ручка', icon: '🖊', baseSize: 3, opacity: 1, texture: 'sharp' },
-            { id: 'marker', name: 'Маркер', icon: '🖍', baseSize: 8, opacity: 0.9, texture: 'smooth' },
-            { id: 'brush', name: 'Кисть', icon: '🖌', baseSize: 12, opacity: 0.8, texture: 'smooth' },
-            { id: 'watercolor', name: 'Акварель', icon: '💧', baseSize: 18, opacity: 0.4, texture: 'watery' },
-            { id: 'gouache', name: 'Гуашь', icon: '🎨', baseSize: 20, opacity: 0.95, texture: 'rough' },
-            { id: 'oil', name: 'Масло', icon: '🖼', baseSize: 16, opacity: 0.85, texture: 'textured' },
-            { id: 'pastel', name: 'Пастель', icon: '🌈', baseSize: 14, opacity: 0.7, texture: 'grainy' },
-            { id: 'charcoal', name: 'Уголь', icon: '⚫️', baseSize: 10, opacity: 0.85, texture: 'grainy' },
-            { id: 'spray', name: 'Спрей', icon: '💨', baseSize: 24, opacity: 0.3, texture: 'spray' },
-            { id: 'neon', name: 'Неон', icon: '✨', baseSize: 6, opacity: 0.9, texture: 'glow' },
-            { id: 'eraser', name: 'Ластик', icon: '🧽', baseSize: 20, opacity: 1, texture: 'eraser' }
+            {
+                id: 'pencil',
+                name: 'Карандаш',
+                icon: '✏️',
+                baseSize: 1,
+                opacity: 0.7,
+                mode: 'pencil' // тонкая полупрозрачная серая
+            },
+            {
+                id: 'pen',
+                name: 'Ручка',
+                icon: '🖊',
+                baseSize: 2,
+                opacity: 1,
+                mode: 'pen' // чёткая тонкая
+            },
+            {
+                id: 'marker',
+                name: 'Маркер',
+                icon: '🖍',
+                baseSize: 10,
+                opacity: 0.85,
+                mode: 'marker' // широкая полупрозрачная
+            },
+            {
+                id: 'brush',
+                name: 'Кисть',
+                icon: '🖌',
+                baseSize: 8,
+                opacity: 0.9,
+                mode: 'brush' // мягкие мазки
+            },
+            {
+                id: 'watercolor',
+                name: 'Акварель',
+                icon: '💧',
+                baseSize: 20,
+                opacity: 0.25,
+                mode: 'watercolor' // растекание
+            },
+            {
+                id: 'gouache',
+                name: 'Гуашь',
+                icon: '🎨',
+                baseSize: 14,
+                opacity: 1,
+                mode: 'gouache' // плотная матовая
+            },
+            {
+                id: 'oil',
+                name: 'Масло',
+                icon: '🖼',
+                baseSize: 12,
+                opacity: 0.95,
+                mode: 'oil' // текстура мазками
+            },
+            {
+                id: 'pastel',
+                name: 'Радуга',
+                icon: '🌈',
+                baseSize: 10,
+                opacity: 0.9,
+                mode: 'rainbow' // меняет цвет
+            },
+            {
+                id: 'charcoal',
+                name: 'Уголь',
+                icon: '⚫️',
+                baseSize: 6,
+                opacity: 0.6,
+                mode: 'charcoal' // растушёвка
+            },
+            {
+                id: 'spray',
+                name: 'Спрей',
+                icon: '💨',
+                baseSize: 16,
+                opacity: 0.5,
+                mode: 'spray' // распыление
+            },
+            {
+                id: 'stars',
+                name: 'Звёзды',
+                icon: '✨',
+                baseSize: 12,
+                opacity: 1,
+                mode: 'stars' // звёздочки!
+            },
+            {
+                id: 'bubbles',
+                name: 'Пузыри',
+                icon: '🫧',
+                baseSize: 14,
+                opacity: 0.7,
+                mode: 'bubbles' // кружки
+            },
+            {
+                id: 'leaves',
+                name: 'Листья',
+                icon: '🍃',
+                baseSize: 14,
+                opacity: 0.9,
+                mode: 'leaves' // листики
+            },
+            {
+                id: 'snow',
+                name: 'Снежинки',
+                icon: '❄️',
+                baseSize: 12,
+                opacity: 0.9,
+                mode: 'snow' // снежинки
+            },
+            {
+                id: 'neon',
+                name: 'Неон',
+                icon: '💡',
+                baseSize: 4,
+                opacity: 1,
+                mode: 'neon' // светящаяся
+            },
+            {
+                id: 'eraser',
+                name: 'Ластик',
+                icon: '🧽',
+                baseSize: 16,
+                opacity: 1,
+                mode: 'eraser'
+            }
         ];
         
         const COLORS = [
@@ -583,8 +677,9 @@
         let dpr = 1;
         let lastPoint = null;
         let sprayInterval = null;
+        let rainbowHue = 0;
         
-        // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // ========== ИНИЦИАЛИЗАЦИЯ CANVAS ==========
         function initCanvas() {
             const wrapper = document.getElementById('canvasWrapper');
             const rect = wrapper.getBoundingClientRect();
@@ -602,37 +697,36 @@
             // Белый фон
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvasSize, canvasSize);
-            
-            applyBrushSettings();
         }
         
         // ========== НАСТРОЙКИ КИСТИ ==========
         function applyBrushSettings() {
             const size = currentBrush.baseSize * currentSizeLevel;
             
+            // Сброс
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
+            ctx.globalAlpha = currentBrush.opacity;
+            ctx.lineWidth = size;
+            ctx.strokeStyle = currentColor;
+            ctx.fillStyle = currentColor;
             
-            if (currentBrush.texture === 'eraser') {
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.globalAlpha = 1;
-                ctx.lineWidth = size * 1.5;
-                ctx.globalCompositeOperation = 'source-over';
-            } else if (currentBrush.texture === 'glow') {
-                ctx.strokeStyle = currentColor;
-                ctx.globalAlpha = currentBrush.opacity;
-                ctx.lineWidth = size;
-                ctx.shadowBlur = 15;
+            // Особые настройки по режиму
+            if (currentBrush.mode === 'neon') {
+                ctx.shadowBlur = 20;
                 ctx.shadowColor = currentColor;
-            } else {
-                ctx.strokeStyle = currentColor;
-                ctx.globalAlpha = currentBrush.opacity;
-                ctx.lineWidth = size;
-                ctx.shadowBlur = 0;
+                ctx.lineWidth = size * 1.5;
+            }
+            
+            if (currentBrush.mode === 'eraser') {
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = size * 2;
             }
         }
         
-        // ========== РИСОВАНИЕ ==========
+        // ========== ПОЗИЦИЯ ==========
         function getPosition(e) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
@@ -651,6 +745,7 @@
             };
         }
         
+        // ========== РИСОВАНИЕ ==========
         function startDrawing(e) {
             e.preventDefault();
             isDrawing = true;
@@ -659,21 +754,27 @@
             const pos = getPosition(e);
             lastPoint = pos;
             
-            // Для спрея — интервальная отрисовка
-            if (currentBrush.texture === 'spray') {
+            // Спрей — интервал
+            if (currentBrush.mode === 'spray') {
                 drawSpray(pos);
                 sprayInterval = setInterval(() => {
                     if (lastPoint) drawSpray(lastPoint);
                 }, 50);
-            } else {
-                ctx.beginPath();
-                ctx.moveTo(pos.x, pos.y);
-                // Точка на месте клика
-                ctx.lineTo(pos.x + 0.1, pos.y + 0.1);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(pos.x, pos.y);
+                return;
             }
+            
+            // Точечные кисти — сразу рисуем
+            if (['stars', 'bubbles', 'leaves', 'snow'].includes(currentBrush.mode)) {
+                drawPointTexture(pos);
+                return;
+            }
+            
+            // Обычная точка в начале
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, ctx.lineWidth / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(pos.x, pos.y);
             
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
@@ -683,33 +784,76 @@
             e.preventDefault();
             
             const pos = getPosition(e);
-            lastPoint = pos;
             
-            if (currentBrush.texture === 'spray') {
-                drawSpray(pos);
+            // Точечные текстуры
+            if (['stars', 'bubbles', 'leaves', 'snow'].includes(currentBrush.mode)) {
+                drawPointTexture(pos);
+                lastPoint = pos;
                 return;
             }
             
-            // Для гранулированных текстур — множественные линии
-            if (currentBrush.texture === 'grainy') {
-                drawGrainy(pos);
+            // Спрей
+            if (currentBrush.mode === 'spray') {
+                lastPoint = pos;
                 return;
             }
             
-            // Для текстурированных — рисуем с вариацией
-            if (currentBrush.texture === 'textured') {
-                drawTextured(pos);
+            // Радуга — меняем цвет
+            if (currentBrush.mode === 'rainbow') {
+                rainbowHue = (rainbowHue + 3) % 360;
+                ctx.strokeStyle = `hsl(${rainbowHue}, 100%, 50%)`;
+            }
+            
+            // Акварель — растекание
+            if (currentBrush.mode === 'watercolor' && lastPoint) {
+                drawWatercolor(lastPoint, pos);
+                lastPoint = pos;
+                return;
+            }
+            
+            // Уголь — растушёвка
+            if (currentBrush.mode === 'charcoal' && lastPoint) {
+                drawCharcoal(lastPoint, pos);
+                lastPoint = pos;
+                return;
+            }
+            
+            // Масло — текстура
+            if (currentBrush.mode === 'oil' && lastPoint) {
+                drawOil(lastPoint, pos);
+                lastPoint = pos;
+                return;
+            }
+            
+            // Карандаш — тонкие штрихи
+            if (currentBrush.mode === 'pencil' && lastPoint) {
+                drawPencil(lastPoint, pos);
+                lastPoint = pos;
                 return;
             }
             
             // Обычная линия
             ctx.lineTo(pos.x, pos.y);
             ctx.stroke();
+            lastPoint = pos;
         }
         
+        function stopDrawing(e) {
+            if (!isDrawing) return;
+            isDrawing = false;
+            lastPoint = null;
+            ctx.closePath();
+            
+            if (sprayInterval) {
+                clearInterval(sprayInterval);
+                sprayInterval = null;
+            }
+        }
+        
+        // ========== ТЕКСТУРЫ ==========
         function drawSpray(pos) {
-            const density = currentSizeLevel * 15;
-            const radius = currentBrush.baseSize * currentSizeLevel;
+            const density = currentSizeLevel * 12;
+            const radius = currentBrush.baseSize * currentSizeLevel * 1.5;
             
             ctx.fillStyle = currentColor;
             ctx.globalAlpha = currentBrush.opacity;
@@ -727,50 +871,144 @@
             }
         }
         
-        function drawGrainy(pos) {
-            const lines = 3;
-            const offset = currentBrush.baseSize * currentSizeLevel * 0.4;
+        function drawWatercolor(from, to) {
+            // Много слоёв с рандомным разбросом = эффект растекания
+            const spread = currentBrush.baseSize * currentSizeLevel * 0.8;
             
-            for (let i = 0; i < lines; i++) {
-                const jitterX = (Math.random() - 0.5) * offset;
-                const jitterY = (Math.random() - 0.5) * offset;
+            for (let i = 0; i < 5; i++) {
+                const offsetX = (Math.random() - 0.5) * spread;
+                const offsetY = (Math.random() - 0.5) * spread;
                 
                 ctx.beginPath();
-                ctx.moveTo(lastPoint.x + jitterX, lastPoint.y + jitterY);
-                ctx.lineTo(pos.x + jitterX, pos.y + jitterY);
+                ctx.moveTo(from.x + offsetX, from.y + offsetY);
+                ctx.lineTo(to.x + offsetX, to.y + offsetY);
                 ctx.stroke();
             }
         }
         
-        function drawTextured(pos) {
-            const offset = currentBrush.baseSize * currentSizeLevel * 0.3;
-            
-            ctx.beginPath();
-            ctx.moveTo(pos.x + (Math.random() - 0.5) * offset,
-                       pos.y + (Math.random() - 0.5) * offset);
-            ctx.lineTo(pos.x + (Math.random() - 0.5) * offset,
-                       pos.y + (Math.random() - 0.5) * offset);
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(lastPoint.x, lastPoint.y);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-        }
-        
-        function stopDrawing(e) {
-            if (!isDrawing) return;
-            isDrawing = false;
-            lastPoint = null;
-            ctx.closePath();
-            
-            if (sprayInterval) {
-                clearInterval(sprayInterval);
-                sprayInterval = null;
+        function drawCharcoal(from, to) {
+            // Растушёвка — несколько полупрозрачных линий
+            for (let i = 0; i < 3; i++) {
+                ctx.globalAlpha = 0.2;
+                ctx.lineWidth = currentBrush.baseSize * currentSizeLevel * (1 + i * 0.5);
+                
+                const jitterX = (Math.random() - 0.5) * 4;
+                const jitterY = (Math.random() - 0.5) * 4;
+                
+                ctx.beginPath();
+                ctx.moveTo(from.x + jitterX, from.y + jitterY);
+                ctx.lineTo(to.x + jitterX, to.y + jitterY);
+                ctx.stroke();
             }
+            ctx.globalAlpha = currentBrush.opacity;
+            ctx.lineWidth = currentBrush.baseSize * currentSizeLevel;
         }
         
-        // Подписки
+        function drawOil(from, to) {
+            // Текстура мазками — короткие разноцветные штрихи
+            const length = currentBrush.baseSize * currentSizeLevel * 1.5;
+            const count = 3;
+            
+            for (let i = 0; i < count; i++) {
+                const angle = Math.atan2(to.y - from.y, to.x - from.x);
+                const perpAngle = angle + Math.PI / 2;
+                const offset = (i - count / 2) * 3;
+                
+                const startX = from.x + Math.cos(perpAngle) * offset;
+                const startY = from.y + Math.sin(perpAngle) * offset;
+                const endX = startX + Math.cos(angle) * length * 0.3;
+                const endY = startY + Math.sin(angle) * length * 0.3;
+                
+                ctx.globalAlpha = 0.7 + Math.random() * 0.3;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = currentBrush.opacity;
+        }
+        
+        function drawPencil(from, to) {
+            // Тонкие множественные штрихи для эффекта карандаша
+            for (let i = 0; i < 4; i++) {
+                const offsetX = (Math.random() - 0.5) * 2;
+                const offsetY = (Math.random() - 0.5) * 2;
+                
+                ctx.globalAlpha = 0.3 + Math.random() * 0.3;
+                ctx.lineWidth = 0.5;
+                
+                ctx.beginPath();
+                ctx.moveTo(from.x + offsetX, from.y + offsetY);
+                ctx.lineTo(to.x + offsetX, to.y + offsetY);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = currentBrush.opacity;
+            ctx.lineWidth = currentBrush.baseSize * currentSizeLevel;
+        }
+        
+        function drawPointTexture(pos) {
+            // Точечные текстуры (звёзды, пузыри, листья, снежинки)
+            const mode = currentBrush.mode;
+            const size = currentBrush.baseSize * currentSizeLevel * 0.8;
+            
+            ctx.save();
+            ctx.translate(pos.x, pos.y);
+            ctx.fillStyle = currentColor;
+            ctx.strokeStyle = currentColor;
+            ctx.globalAlpha = currentBrush.opacity;
+            
+            switch (mode) {
+                case 'stars':
+                    // Звёздочка
+                    drawStar(0, 0, 5, size, size / 2);
+                    break;
+                case 'bubbles':
+                    // Кружок
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size, 0, Math.PI * 2);
+                    ctx.stroke();
+                    break;
+                case 'leaves':
+                    // Листик
+                    ctx.beginPath();
+                    ctx.ellipse(0, 0, size, size * 0.5, Math.PI / 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                case 'snow':
+                    // Снежинка
+                    for (let i = 0; i < 6; i++) {
+                        const angle = (Math.PI / 3) * i;
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(Math.cos(angle) * size, Math.sin(angle) * size);
+                        ctx.stroke();
+                    }
+                    break;
+            }
+            
+            ctx.restore();
+        }
+        
+        function drawStar(cx, cy, spikes, outerR, innerR) {
+            let rot = Math.PI / 2 * 3;
+            let step = Math.PI / spikes;
+            
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerR);
+            
+            for (let i = 0; i < spikes; i++) {
+                ctx.lineTo(cx + Math.cos(rot) * outerR, cy + Math.sin(rot) * outerR);
+                rot += step;
+                ctx.lineTo(cx + Math.cos(rot) * innerR, cy + Math.sin(rot) * innerR);
+                rot += step;
+            }
+            
+            ctx.lineTo(cx, cy - outerR);
+            ctx.closePath();
+            ctx.fill();
+        }
+        
+        // ========== ПОДПИСКИ ==========
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', stopDrawing);
@@ -789,21 +1027,16 @@
         
         function undo() {
             if (history.length === 0) return;
-            
             const imageData = history.pop();
             ctx.putImageData(imageData, 0, 0);
-            
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
         
         function clearCanvas() {
             if (!confirm('Очистить рисунок?')) return;
-            
             saveHistory();
-            
             ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, canvasSize, canvasSize);
-            
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
         }
         
@@ -824,7 +1057,6 @@
             applyBrushSettings();
             renderBrushes();
             updateSizePreview();
-            
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
         
@@ -838,7 +1070,6 @@
                 </button>
             `).join('');
             
-            // Кастомный цвет
             html += `
                 <div class="color-picker">
                     🎨
@@ -851,88 +1082,124 @@
         
         function selectColor(color) {
             currentColor = color;
-            
-            if (currentBrush.texture !== 'eraser') {
+            if (currentBrush.mode !== 'eraser' && currentBrush.mode !== 'rainbow') {
                 ctx.strokeStyle = color;
+                ctx.fillStyle = color;
             }
-            
             renderColors();
             updateSizePreview();
-            
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
         }
         
         function updateSizePreview() {
             const preview = document.getElementById('sizePreview');
-            preview.setAttribute('data-size', currentSizeLevel);
-            preview.style.color = currentBrush.texture === 'eraser' ? '#ddd' : currentColor;
+            const sizes = [4, 6, 10, 16, 24];
+            const size = sizes[currentSizeLevel - 1];
+            
+            preview.style.width = size + 'px';
+            preview.style.height = size + 'px';
+            preview.style.background = currentBrush.mode === 'eraser' ? '#ddd' : currentColor;
         }
         
-        // Слайдер размера
         document.getElementById('sizeSlider').addEventListener('input', (e) => {
             currentSizeLevel = parseInt(e.target.value);
             applyBrushSettings();
             updateSizePreview();
         });
         
-        // ========== FULLSCREEN ==========
-        function toggleFullscreen() {
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        // ========== ЗАГРУЗКА КАРТИНКИ ==========
+        function loadImage() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             
-            if (canvas.requestFullscreen) {
-                canvas.requestFullscreen().catch(() => {});
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        saveHistory();
+                        
+                        // Вписываем картинку в canvas с сохранением пропорций
+                        const canvasRatio = canvasSize / canvasSize;
+                        const imgRatio = img.width / img.height;
+                        
+                        let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+                        
+                        if (imgRatio > canvasRatio) {
+                            drawWidth = canvasSize;
+                            drawHeight = canvasSize / imgRatio;
+                            offsetY = (canvasSize - drawHeight) / 2;
+                        } else {
+                            drawHeight = canvasSize;
+                            drawWidth = canvasSize * imgRatio;
+                            offsetX = (canvasSize - drawWidth) / 2;
+                        }
+                        
+                        ctx.globalAlpha = 0.5; // Полупрозрачная подложка
+                        ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                        ctx.globalAlpha = currentBrush.opacity;
+                        
+                        if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+            
+            input.click();
+        }
+        
+        // ========== СОХРАНЕНИЕ КАРТИНКИ ==========
+        function saveImage() {
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            
+            try {
+                const dataURL = canvas.toDataURL('image/png');
+                
+                // Создаём ссылку для скачивания
+                const link = document.createElement('a');
+                link.download = `рисовашка_${todayTheme.text.replace(/\s+/g, '_')}_${Date.now()}.png`;
+                link.href = dataURL;
+                link.click();
+                
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+            } catch (e) {
+                console.error('Save error:', e);
+                alert('Не удалось сохранить. Попробуй долгое нажатие на картинку → "Сохранить".');
             }
         }
         
-        // ========== СОХРАНЕНИЕ ==========
+        // ========== ЗАВЕРШЕНИЕ ==========
         function finishDrawing() {
-            // Проверяем что что-то нарисовано
             const imageData = canvas.toDataURL('image/png');
             
-            // Начисляем баллы
             Storage.addBalance(10);
             const streak = Storage.updateStreak();
             
-            // Сохраняем рисунок
             const drawing = Storage.saveDrawing({
                 theme: todayTheme.text,
                 themeEmoji: todayTheme.emoji,
                 image: imageData
             });
             
-            // Стрик бонус
             if (streak > 1 && streak % 7 === 0) {
                 Storage.addBalance(50);
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
             
-            // Показываем модалку
             document.getElementById('modalSub').textContent =
                 `Ты нарисовал(а) «${todayTheme.text}»`;
             
             document.getElementById('successModal').classList.add('open');
             document.getElementById('successModal').dataset.drawingId = drawing.id;
             
-            if (tg?.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        }
-        
-        function submitToTeacher() {
-            const drawingId = parseInt(document.getElementById('successModal').dataset.drawingId);
-            
-            const success = Storage.submitToTeacher(drawingId);
-            
-            if (success) {
-                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
-                alert('✅ Рисунок отправлен преподавателю!\n\nОн оценит его в ближайшее время.');
-            } else {
-                alert('⚠️ Не удалось отправить.\n\nПопробуй позже или покажи рисунок преподавателю в школе.');
-            }
-            
-            setTimeout(() => {
-                location.href = '../profile/index.html';
-            }, 1000);
+            if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
         }
         
         function continueDrawing() {
@@ -944,6 +1211,7 @@
         // ========== СТАРТ ==========
         window.addEventListener('load', () => {
             initCanvas();
+            applyBrushSettings();
             renderBrushes();
             renderColors();
             updateSizePreview();
@@ -951,7 +1219,7 @@
         
         setTimeout(() => showHint(), 1500);
         
-        console.log('🎨 Рисовашка: 12 кистей загружено');
+        console.log('🎨 Рисовашка: 16 кистей загружено');
     </script>
 </body>
 </html>
