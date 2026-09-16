@@ -429,7 +429,6 @@
             max-width: 400px;
             width: 100%;
             text-align: center;
-            animation: popIn 0.3s ease-out;
         }
         
         .save-title {
@@ -484,7 +483,6 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: all 0.15s;
         }
         
         .save-btn:active { transform: scale(0.97); }
@@ -631,11 +629,11 @@
             { id: 'rainbow', name: 'Радуга', icon: '🌈', baseSize: 10, opacity: 0.9, mode: 'rainbow' },
             { id: 'charcoal', name: 'Уголь', icon: '⚫️', baseSize: 6, opacity: 0.6, mode: 'charcoal' },
             { id: 'spray', name: 'Спрей', icon: '💨', baseSize: 16, opacity: 0.5, mode: 'spray' },
-            { id: 'stars', name: 'Звёзды', icon: '✨', baseSize: 12, opacity: 1, mode: 'stars' },
+            { id: 'glitter', name: 'Блёстки', icon: '💫', baseSize: 10, opacity: 1, mode: 'glitter' },
+            { id: 'salut', name: 'Салютик', icon: '🎇', baseSize: 12, opacity: 0.9, mode: 'salut' },
+            { id: 'dust', name: 'Пыль', icon: '🌟', baseSize: 14, opacity: 0.7, mode: 'dust' },
             { id: 'firework', name: 'Фейерверк', icon: '🎆', baseSize: 14, opacity: 0.9, mode: 'firework' },
             { id: 'smoke', name: 'Дымка', icon: '🌫', baseSize: 24, opacity: 0.15, mode: 'smoke' },
-            { id: 'drops', name: 'Капли', icon: '🍯', baseSize: 10, opacity: 0.7, mode: 'drops' },
-            { id: 'petals', name: 'Цветение', icon: '🌸', baseSize: 8, opacity: 0.85, mode: 'petals' },
             { id: 'neon', name: 'Неон', icon: '💡', baseSize: 4, opacity: 1, mode: 'neon' },
             { id: 'eraser', name: 'Ластик', icon: '🧽', baseSize: 16, opacity: 1, mode: 'eraser' }
         ];
@@ -746,7 +744,7 @@
                 return;
             }
             
-            if (['stars', 'firework', 'drops', 'petals', 'smoke'].includes(currentBrush.mode)) {
+            if (['glitter', 'salut', 'dust', 'firework', 'smoke'].includes(currentBrush.mode)) {
                 drawTexturePoint(pos);
                 return;
             }
@@ -766,7 +764,7 @@
             
             const pos = getPosition(e);
             
-            if (['stars', 'firework', 'drops', 'petals', 'smoke'].includes(currentBrush.mode)) {
+            if (['glitter', 'salut', 'dust', 'firework', 'smoke'].includes(currentBrush.mode)) {
                 drawTexturePoint(pos);
                 lastPoint = pos;
                 return;
@@ -990,59 +988,124 @@
             const size = currentBrush.baseSize * currentSizeLevel * 0.8;
             
             switch (mode) {
-                case 'stars': drawStars(pos, size); break;
+                case 'glitter': drawGlitter(pos, size); break;
+                case 'salut': drawSalut(pos, size); break;
+                case 'dust': drawDust(pos, size); break;
                 case 'firework': drawFirework(pos, size); break;
-                case 'drops': drawDrops(pos, size); break;
-                case 'petals': drawPetals(pos, size); break;
                 case 'smoke': drawSmoke(pos, size); break;
             }
         }
         
-        // ✨ ЗВЁЗДЫ — классическая 5-конечная звезда (та самая версия!)
-        function drawStars(pos, size) {
-            const count = 1 + Math.floor(Math.random() * 2);
+        // 💫 БЛЁСТКИ — мелкие точки вокруг с лёгким свечением
+        function drawGlitter(pos, size) {
+            const count = 8 + Math.floor(Math.random() * 8);
+            const radius = size * 1.2;
             
             for (let i = 0; i < count; i++) {
-                const offsetX = (Math.random() - 0.5) * size * 1.5;
-                const offsetY = (Math.random() - 0.5) * size * 1.5;
-                const starSize = size * (0.7 + Math.random() * 0.6);
-                const rotation = Math.random() * Math.PI * 2;
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * radius;
+                const x = pos.x + Math.cos(angle) * dist;
+                const y = pos.y + Math.sin(angle) * dist;
+                const dotSize = size * (0.08 + Math.random() * 0.15);
                 
-                ctx.save();
-                ctx.translate(pos.x + offsetX, pos.y + offsetY);
-                ctx.rotate(rotation);
+                // Цветные блёстки
                 ctx.fillStyle = currentColor;
-                ctx.globalAlpha = 0.9 + Math.random() * 0.1;
-                
-                // 5-конечная звезда
-                const spikes = 5;
-                const outerR = starSize;
-                const innerR = starSize * 0.45;
-                
-                let rot = Math.PI / 2 * 3;
-                const step = Math.PI / spikes;
+                ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = currentColor;
                 
                 ctx.beginPath();
-                ctx.moveTo(0, -outerR);
+                ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+                ctx.fill();
                 
-                for (let s = 0; s < spikes; s++) {
-                    ctx.lineTo(Math.cos(rot) * outerR, Math.sin(rot) * outerR);
-                    rot += step;
-                    ctx.lineTo(Math.cos(rot) * innerR, Math.sin(rot) * innerR);
-                    rot += step;
+                // Иногда — белые блёстки-искорки
+                if (Math.random() > 0.7) {
+                    ctx.fillStyle = 'white';
+                    ctx.globalAlpha = 0.9;
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = 'white';
+                    ctx.beginPath();
+                    ctx.arc(x, y, dotSize * 0.6, 0, Math.PI * 2);
+                    ctx.fill();
                 }
-                
-                ctx.closePath();
-                ctx.fill();
-                
-                // Блеск в верхнем левом углу
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.beginPath();
-                ctx.arc(-starSize * 0.15, -starSize * 0.2, starSize * 0.18, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.restore();
             }
+            
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = currentBrush.opacity;
+        }
+        
+        // 🎇 САЛЮТИК — точки разлетаются в стороны
+        function drawSalut(pos, size) {
+            const particles = 10 + Math.floor(Math.random() * 6);
+            const radius = size * 1.8;
+            
+            for (let i = 0; i < particles; i++) {
+                const angle = (Math.PI * 2 / particles) * i + Math.random() * 0.3;
+                const dist = radius * (0.7 + Math.random() * 0.3);
+                const x = pos.x + Math.cos(angle) * dist;
+                const y = pos.y + Math.sin(angle) * dist;
+                const particleSize = size * (0.15 + Math.random() * 0.25);
+                
+                ctx.fillStyle = currentColor;
+                ctx.globalAlpha = 0.7 + Math.random() * 0.3;
+                
+                // Частица-точка
+                ctx.beginPath();
+                ctx.arc(x, y, particleSize, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Хвостик-лучик от центра
+                ctx.strokeStyle = currentColor;
+                ctx.globalAlpha = 0.4;
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(pos.x + Math.cos(angle) * dist * 0.5, pos.y + Math.sin(angle) * dist * 0.5);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+            }
+            
+            ctx.globalAlpha = currentBrush.opacity;
+        }
+        
+        // 🌟 ПЫЛЬ — точки, оседающие вниз (звёздная пыль)
+        function drawDust(pos, size) {
+            const count = 4 + Math.floor(Math.random() * 4);
+            
+            for (let i = 0; i < count; i++) {
+                const offsetX = (Math.random() - 0.5) * size * 2;
+                // Смещение вниз — эффект оседания
+                const offsetY = Math.random() * size * 2;
+                const x = pos.x + offsetX;
+                const y = pos.y + offsetY;
+                const dotSize = size * (0.1 + Math.random() * 0.2);
+                
+                // Лёгкая дорожка от частицы
+                ctx.strokeStyle = currentColor;
+                ctx.globalAlpha = 0.3;
+                ctx.lineWidth = dotSize * 0.8;
+                ctx.beginPath();
+                ctx.moveTo(x, y - size * 0.4);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Точка
+                ctx.fillStyle = currentColor;
+                ctx.globalAlpha = 0.6 + Math.random() * 0.4;
+                ctx.beginPath();
+                ctx.arc(x, y, dotSize, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Блеск
+                if (Math.random() > 0.8) {
+                    ctx.fillStyle = 'white';
+                    ctx.globalAlpha = 0.8;
+                    ctx.beginPath();
+                    ctx.arc(x, y, dotSize * 0.4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            ctx.globalAlpha = currentBrush.opacity;
         }
         
         function drawFirework(pos, size) {
@@ -1070,75 +1133,6 @@
                 ctx.arc(x, y, particleSize * 0.5, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
-            }
-            
-            ctx.globalAlpha = currentBrush.opacity;
-        }
-        
-        function drawDrops(pos, size) {
-            const count = 1 + Math.floor(Math.random() * 3);
-            
-            for (let i = 0; i < count; i++) {
-                const offsetX = (Math.random() - 0.5) * size * 2;
-                const offsetY = (Math.random() - 0.5) * size * 2;
-                const dropSize = size * (0.4 + Math.random() * 0.6);
-                
-                ctx.fillStyle = currentColor;
-                ctx.globalAlpha = 0.6 + Math.random() * 0.4;
-                
-                ctx.beginPath();
-                ctx.arc(pos.x + offsetX, pos.y + offsetY, dropSize, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.globalAlpha = 0.6;
-                ctx.beginPath();
-                ctx.arc(
-                    pos.x + offsetX - dropSize * 0.3,
-                    pos.y + offsetY - dropSize * 0.3,
-                    dropSize * 0.3,
-                    0, Math.PI * 2
-                );
-                ctx.fill();
-                
-                ctx.strokeStyle = currentColor;
-                ctx.globalAlpha = 0.8;
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.arc(pos.x + offsetX, pos.y + offsetY, dropSize, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            
-            ctx.globalAlpha = currentBrush.opacity;
-        }
-        
-        function drawPetals(pos, size) {
-            const count = 1 + Math.floor(Math.random() * 2);
-            
-            for (let i = 0; i < count; i++) {
-                const offsetX = (Math.random() - 0.5) * size * 1.5;
-                const offsetY = (Math.random() - 0.5) * size * 1.5;
-                const petalSize = size * (0.6 + Math.random() * 0.5);
-                const rotation = Math.random() * Math.PI * 2;
-                
-                ctx.save();
-                ctx.translate(pos.x + offsetX, pos.y + offsetY);
-                ctx.rotate(rotation);
-                ctx.fillStyle = currentColor;
-                ctx.globalAlpha = 0.7 + Math.random() * 0.3;
-                
-                ctx.beginPath();
-                ctx.ellipse(0, 0, petalSize, petalSize * 0.5, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.strokeStyle = 'rgba(255,255,255,0.3)';
-                ctx.lineWidth = 0.8;
-                ctx.beginPath();
-                ctx.moveTo(-petalSize * 0.7, 0);
-                ctx.lineTo(petalSize * 0.7, 0);
-                ctx.stroke();
-                
-                ctx.restore();
             }
             
             ctx.globalAlpha = currentBrush.opacity;
@@ -1194,26 +1188,21 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
         
-        // ========== ОЧИСТКА (ИСПРАВЛЕНО) ==========
+        // ========== ОЧИСТКА ==========
         function clearCanvas() {
             if (!confirm('Очистить рисунок?')) return;
             
-            // Сохраняем в историю для отмены
             saveHistory();
             
-            // ВАЖНО: сбрасываем все настройки контекста
             ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0); // Сбрасываем трансформации
-            ctx.globalAlpha = 1;                  // Полная непрозрачность
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.globalAlpha = 1;
             ctx.globalCompositeOperation = 'source-over';
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height); // Заливаем ВСЁ полотно
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.restore();
             
-            // Восстанавливаем масштаб для рисования
             ctx.scale(dpr, dpr);
-            
-            // Возвращаем настройки кисти
             applyBrushSettings();
             
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
@@ -1468,7 +1457,7 @@
         
         setTimeout(() => showHint(), 1500);
         
-        console.log('🎨 16 кистей загружено');
+        console.log('🎨 16 кистей: 3 новые искристые!');
     </script>
 </body>
 </html>
