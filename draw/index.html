@@ -331,6 +331,8 @@
             width: 100%;
             text-align: center;
             animation: popIn 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes popIn {
@@ -359,6 +361,7 @@
             font-size: 14px;
             color: var(--hint);
             margin-bottom: 20px;
+            line-height: 1.5;
         }
         
         .points-earned {
@@ -410,6 +413,107 @@
             font-size: 13px;
             cursor: pointer;
         }
+        
+        /* ========== МОДАЛКА СОХРАНЕНИЯ ========== */
+        .save-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .save-modal.open { display: flex; }
+        
+        .save-modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+        
+        .save-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .save-hint {
+            font-size: 13px;
+            color: var(--hint);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        
+        .save-hint b {
+            color: var(--pink);
+            font-size: 14px;
+        }
+        
+        .save-image-wrap {
+            background: #F5F5F5;
+            border-radius: 16px;
+            padding: 8px;
+            margin-bottom: 16px;
+        }
+        
+        .save-image {
+            width: 100%;
+            border-radius: 12px;
+            display: block;
+            -webkit-touch-callout: default;
+            -webkit-user-select: auto;
+            user-select: auto;
+            pointer-events: auto;
+        }
+        
+        .save-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .save-btn {
+            padding: 14px 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.15s;
+        }
+        
+        .save-btn:active { transform: scale(0.97); }
+        
+        .save-btn-primary {
+            background: linear-gradient(135deg, #FF6B9D, #9B59B6);
+            color: white;
+            grid-column: 1 / -1;
+        }
+        
+        .save-btn-secondary {
+            background: #F0F0F0;
+            color: var(--text);
+        }
+        
+        .save-btn-telegram {
+            background: linear-gradient(135deg, #0088cc, #0077b3);
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -447,6 +551,7 @@
         </div>
     </div>
     
+    <!-- МОДАЛКА ФИНАЛА -->
     <div class="modal" id="successModal">
         <div class="modal-content">
             <div class="modal-emoji">🎉</div>
@@ -466,6 +571,33 @@
             <button class="modal-btn-secondary" onclick="continueDrawing()">
                 ✏️ Нарисовать ещё
             </button>
+        </div>
+    </div>
+    
+    <!-- МОДАЛКА СОХРАНЕНИЯ -->
+    <div class="save-modal" id="saveModal">
+        <div class="save-modal-content">
+            <div class="save-title">💾 Сохранить рисунок</div>
+            <div class="save-hint">
+                <b>Долгое нажатие</b> на картинку<br>
+                → «Сохранить в галерею» / «Save Image»
+            </div>
+            
+            <div class="save-image-wrap">
+                <img class="save-image" id="saveImagePreview" src="" alt="Рисунок">
+            </div>
+            
+            <div class="save-actions">
+                <button class="save-btn save-btn-telegram" onclick="sendToTelegram()">
+                    📤 В Telegram
+                </button>
+                <button class="save-btn save-btn-secondary" onclick="downloadDirect()">
+                    ⬇️ Скачать
+                </button>
+                <button class="save-btn save-btn-primary" onclick="closeSaveModal()">
+                    Готово
+                </button>
+            </div>
         </div>
     </div>
     
@@ -573,7 +705,6 @@
             ctx.strokeStyle = currentColor;
             ctx.fillStyle = currentColor;
             
-            // Маркер — плоский квадратный кончик
             if (currentBrush.mode === 'marker') {
                 ctx.lineCap = 'square';
                 ctx.lineJoin = 'miter';
@@ -804,13 +935,11 @@
             ctx.lineWidth = currentBrush.baseSize * currentSizeLevel;
         }
         
-        // 🖌 КИСТЬ — мягкая с текстурой волосков
         function drawBrush(from, to) {
             const size = currentBrush.baseSize * currentSizeLevel;
             const hairs = 5 + currentSizeLevel * 2;
             const spread = size * 0.6;
             
-            // Основная мягкая линия
             ctx.globalAlpha = currentBrush.opacity * 0.7;
             ctx.lineWidth = size * 0.7;
             ctx.beginPath();
@@ -818,7 +947,6 @@
             ctx.lineTo(to.x, to.y);
             ctx.stroke();
             
-            // Волоски — тонкие линии с разбросом
             for (let i = 0; i < hairs; i++) {
                 const angle = Math.atan2(to.y - from.y, to.x - from.x);
                 const perpAngle = angle + Math.PI / 2;
@@ -844,11 +972,9 @@
             ctx.lineWidth = size;
         }
         
-        // 🖍 МАРКЕР — плоская чёткая линия
         function drawMarker(from, to) {
             const size = currentBrush.baseSize * currentSizeLevel;
             
-            // Основная чёткая линия
             ctx.globalAlpha = currentBrush.opacity;
             ctx.lineWidth = size;
             ctx.lineCap = 'square';
@@ -858,7 +984,6 @@
             ctx.lineTo(to.x, to.y);
             ctx.stroke();
             
-            // Лёгкая текстура по краям
             ctx.globalAlpha = currentBrush.opacity * 0.3;
             ctx.lineWidth = size * 1.15;
             
@@ -883,7 +1008,6 @@
             }
         }
         
-        // ✨ ИСКРЫ — 4-лучевые звёздочки-вспышки с блеском
         function drawStars(pos, size) {
             const count = 1 + Math.floor(Math.random() * 3);
             
@@ -897,11 +1021,9 @@
                 ctx.fillStyle = currentColor;
                 ctx.globalAlpha = 0.8 + Math.random() * 0.2;
                 
-                // Свечение
                 ctx.shadowBlur = 10;
                 ctx.shadowColor = currentColor;
                 
-                // 4-лучевая искра
                 const spikes = 4;
                 const outerR = sparkSize;
                 const innerR = sparkSize * 0.15;
@@ -919,7 +1041,6 @@
                 ctx.closePath();
                 ctx.fill();
                 
-                // Белая точка в центре
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = 'white';
                 ctx.beginPath();
@@ -932,7 +1053,6 @@
             ctx.shadowBlur = 0;
         }
         
-        // 🎆 Фейерверк
         function drawFirework(pos, size) {
             const particles = 8 + Math.floor(Math.random() * 8);
             const radius = size * 1.5;
@@ -963,7 +1083,6 @@
             ctx.globalAlpha = currentBrush.opacity;
         }
         
-        // 🍯 Капли
         function drawDrops(pos, size) {
             const count = 1 + Math.floor(Math.random() * 3);
             
@@ -1001,7 +1120,6 @@
             ctx.globalAlpha = currentBrush.opacity;
         }
         
-        // 🌸 Цветение
         function drawPetals(pos, size) {
             const count = 1 + Math.floor(Math.random() * 2);
             
@@ -1034,7 +1152,6 @@
             ctx.globalAlpha = currentBrush.opacity;
         }
         
-        // 🌫 Дымка
         function drawSmoke(pos, size) {
             const layers = 3 + Math.floor(Math.random() * 3);
             const radius = size * (1.5 + Math.random());
@@ -1158,6 +1275,7 @@
             updateSizePreview();
         });
         
+        // ========== ЗАГРУЗКА КАРТИНКИ ==========
         function loadImage() {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             
@@ -1190,7 +1308,6 @@
                             offsetX = (canvasSize - drawWidth) / 2;
                         }
                         
-                        // 100% непрозрачность
                         ctx.globalAlpha = 1;
                         ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
                         ctx.globalAlpha = currentBrush.opacity;
@@ -1205,22 +1322,103 @@
             input.click();
         }
         
+        // ========== СОХРАНЕНИЕ НА ТЕЛЕФОН ==========
         function saveImage() {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
             
             try {
                 const dataURL = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = `рисовашка_${todayTheme.text.replace(/\s+/g, '_')}_${Date.now()}.png`;
-                link.href = dataURL;
-                link.click();
-                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                
+                // Показываем модалку с картинкой
+                document.getElementById('saveImagePreview').src = dataURL;
+                document.getElementById('saveModal').classList.add('open');
+                
             } catch (e) {
                 console.error('Save error:', e);
-                alert('Не удалось сохранить.');
+                alert('Не удалось подготовить рисунок');
             }
         }
         
+        function closeSaveModal() {
+            document.getElementById('saveModal').classList.remove('open');
+            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+        }
+        
+        // Отправка в Telegram (в чат с ботом)
+        function sendToTelegram() {
+            const dataURL = canvas.toDataURL('image/png');
+            
+            if (!tg) {
+                alert('Открой через Telegram');
+                return;
+            }
+            
+            // Способ 1: sendData (если открыт через Menu Button)
+            try {
+                tg.sendData(JSON.stringify({
+                    action: 'save_image',
+                    theme: todayTheme.text,
+                    image: dataURL,
+                    timestamp: Date.now()
+                }));
+                
+                if (tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                
+                closeSaveModal();
+                
+                setTimeout(() => {
+                    alert('✅ Рисунок отправлен в чат с ботом!\n\nНайди его в переписке и сохрани в галерею.');
+                }, 300);
+                
+            } catch (e) {
+                console.error('Send error:', e);
+                alert('Не удалось отправить. Используй долгое нажатие на картинку.');
+            }
+        }
+        
+        // Прямое скачивание (работает в браузере, в боте может не сработать)
+        function downloadDirect() {
+            const dataURL = canvas.toDataURL('image/png');
+            const filename = `рисовашка_${Date.now()}.png`;
+            
+            try {
+                // Способ 1: через blob (лучше работает на Android)
+                const byteString = atob(dataURL.split(',')[1]);
+                const mimeString = dataURL.split(',')[0].split(':')[1].split(';')[0];
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                
+                for (let i = 0; i < byteString.length; i++) {
+                    ia[i] = byteString.charCodeAt(i);
+                }
+                
+                const blob = new Blob([ab], { type: mimeString });
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+                
+                if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+                
+            } catch (e) {
+                console.error('Download error:', e);
+                
+                // Способ 2: через openLink (открывает в браузере)
+                if (tg) {
+                    tg.openLink(dataURL);
+                } else {
+                    window.open(dataURL, '_blank');
+                }
+            }
+        }
+        
+        // ========== ЗАВЕРШЕНИЕ ==========
         function finishDrawing() {
             const imageData = canvas.toDataURL('image/png');
             
@@ -1253,6 +1451,17 @@
             clearCanvas();
         }
         
+        // Закрытие модалки по клику вне
+        document.getElementById('saveModal').addEventListener('click', (e) => {
+            if (e.target.id === 'saveModal') closeSaveModal();
+        });
+        
+        document.getElementById('successModal').addEventListener('click', (e) => {
+            if (e.target.id === 'successModal') {
+                document.getElementById('successModal').classList.remove('open');
+            }
+        });
+        
         window.addEventListener('load', () => {
             initCanvas();
             applyBrushSettings();
@@ -1263,7 +1472,7 @@
         
         setTimeout(() => showHint(), 1500);
         
-        console.log('🎨 16 кистей загружено');
+        console.log('🎨 16 кистей + сохранение в Telegram');
     </script>
 </body>
 </html>
