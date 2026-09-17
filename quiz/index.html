@@ -27,9 +27,9 @@
             display: flex;
             flex-direction: column;
             color: var(--text);
+            overflow-x: hidden;
         }
         
-        /* ========== ШАПКА ========== */
         .top-bar {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
@@ -37,6 +37,9 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         
         .back-btn {
@@ -48,23 +51,11 @@
             border-radius: 50%;
             font-size: 18px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
-        .top-bar-title {
-            flex: 1;
-            font-size: 16px;
-            font-weight: 700;
-        }
+        .top-bar-title { flex: 1; font-size: 15px; font-weight: 700; }
+        .step-counter { font-size: 13px; opacity: 0.9; }
         
-        .step-counter {
-            font-size: 13px;
-            opacity: 0.9;
-        }
-        
-        /* ========== ПРОГРЕСС ========== */
         .progress-bar {
             height: 6px;
             background: #FFE5F0;
@@ -72,6 +63,7 @@
             border-radius: 3px;
             overflow: hidden;
             margin-top: 12px;
+            margin-bottom: 12px;
         }
         
         .progress-fill {
@@ -82,10 +74,9 @@
             width: 0%;
         }
         
-        /* ========== ВОПРОС ========== */
         .quiz-container {
             flex: 1;
-            padding: 24px 20px;
+            padding: 12px 20px 30px;
             display: flex;
             flex-direction: column;
         }
@@ -121,7 +112,6 @@
             margin-bottom: 24px;
         }
         
-        /* ========== ВАРИАНТЫ ========== */
         .options {
             display: flex;
             flex-direction: column;
@@ -141,36 +131,18 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
-        .option:active {
-            transform: scale(0.97);
-        }
+        .option:active { transform: scale(0.97); }
         
         .option.selected {
             border-color: var(--pink);
             background: #FFE5F0;
         }
         
-        .option-icon {
-            font-size: 28px;
-            flex-shrink: 0;
-        }
+        .option-icon { font-size: 28px; flex-shrink: 0; }
+        .option-text { flex: 1; font-size: 15px; font-weight: 600; }
+        .option-arrow { color: var(--hint); font-size: 18px; }
+        .option.selected .option-arrow { color: var(--pink); }
         
-        .option-text {
-            flex: 1;
-            font-size: 15px;
-            font-weight: 600;
-        }
-        
-        .option-arrow {
-            color: var(--hint);
-            font-size: 18px;
-        }
-        
-        .option.selected .option-arrow {
-            color: var(--pink);
-        }
-        
-        /* ========== РЕЗУЛЬТАТ ========== */
         .result-screen {
             display: none;
             padding: 20px;
@@ -178,9 +150,7 @@
             animation: popIn 0.4s ease-out;
         }
         
-        .result-screen.active {
-            display: block;
-        }
+        .result-screen.active { display: block; }
         
         @keyframes popIn {
             from { transform: scale(0.9); opacity: 0; }
@@ -216,7 +186,7 @@
         .result-desc {
             font-size: 15px;
             color: #555;
-            line-height: 1.5;
+            line-height: 1.6;
             margin-bottom: 20px;
             padding: 0 10px;
         }
@@ -268,29 +238,12 @@
             transition: transform 0.2s;
         }
         
-        .course-card:active {
-            transform: scale(0.98);
-        }
+        .course-card:active { transform: scale(0.98); }
         
-        .course-emoji {
-            font-size: 32px;
-            flex-shrink: 0;
-        }
-        
-        .course-info {
-            flex: 1;
-        }
-        
-        .course-name {
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-        
-        .course-meta {
-            font-size: 12px;
-            color: var(--hint);
-        }
+        .course-emoji { font-size: 32px; flex-shrink: 0; }
+        .course-info { flex: 1; }
+        .course-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .course-meta { font-size: 12px; color: var(--hint); }
         
         .diploma-badge {
             background: #FFF5E0;
@@ -330,12 +283,9 @@
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(255,107,157,0.3);
-            transition: transform 0.2s;
         }
         
-        .btn-primary:active {
-            transform: scale(0.97);
-        }
+        .btn-primary:active { transform: scale(0.97); }
         
         .btn-secondary {
             background: white;
@@ -348,28 +298,21 @@
             cursor: pointer;
         }
         
-        /* ========== СКРЫТЫЕ ЭЛЕМЕНТЫ ========== */
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <!-- ШАПКА -->
     <div class="top-bar">
         <button class="back-btn" onclick="goBack()">←</button>
         <div class="top-bar-title">🎯 Квест: Твой архетип</div>
         <div class="step-counter" id="stepCounter">1/7</div>
     </div>
     
-    <!-- ПРОГРЕСС -->
     <div class="progress-bar">
         <div class="progress-fill" id="progressFill"></div>
     </div>
     
-    <!-- ОСНОВНОЙ КОНТЕЙНЕР -->
     <div class="quiz-container">
-        <!-- ВОПРОС -->
         <div class="question-block" id="questionBlock">
             <div class="question-number" id="questionNumber">Вопрос 1</div>
             <div class="question-title" id="questionTitle">Загрузка...</div>
@@ -377,7 +320,6 @@
             <div class="options" id="optionsList"></div>
         </div>
         
-        <!-- РЕЗУЛЬТАТ -->
         <div class="result-screen" id="resultScreen">
             <div class="result-emoji" id="resultEmoji">🎨</div>
             <div class="result-label">Твой архетип</div>
@@ -391,9 +333,7 @@
                 <div id="recommendedCourses"></div>
             </div>
             
-            <div class="points-bonus">
-                🎁 +50 баллов за прохождение!
-            </div>
+            <div class="points-bonus">🎁 +50 баллов за прохождение!</div>
             
             <div class="result-actions">
                 <button class="btn-primary" onclick="bookTrial()">
@@ -406,14 +346,11 @@
         </div>
     </div>
     
-    <!-- ДАННЫЕ -->
     <script src="../shared/data/quiz.js"></script>
     <script src="../shared/data/archetypes.js"></script>
     <script src="../shared/data/courses.js"></script>
     
-    <!-- ЛОГИКА -->
     <script>
-        // ========== TELEGRAM ==========
         let tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -421,6 +358,14 @@
             tg.setHeaderColor('#FF6B9D');
             tg.setBackgroundColor('#FFF5F8');
         }
+        
+        // ========== СОСТОЯНИЕ ==========
+        let currentStep = 0;
+        let answers = [];
+        let showingResult = false;
+        let selectedOption = null;
+        let ageGroup = null;
+        let activeQuestions = [];
         
         function goBack() {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
@@ -433,32 +378,26 @@
             }
         }
         
-        // ========== СОСТОЯНИЕ ==========
-        let currentStep = 0;
-        let answers = [];
-        let showingResult = false;
-        let selectedOption = null;
-        
-        // ========== ОТОБРАЖЕНИЕ ВОПРОСА ==========
+        // ========== ПОКАЗ ВОПРОСА ==========
         function renderQuestion() {
-            if (currentStep >= QUIZ_QUESTIONS.length) {
+            if (currentStep >= activeQuestions.length) {
                 showResult();
                 return;
             }
             
-            const q = QUIZ_QUESTIONS[currentStep];
+            const q = activeQuestions[currentStep];
             selectedOption = null;
             
-            // Обновляем шапку
-            document.getElementById('stepCounter').textContent = `${currentStep + 1}/${QUIZ_QUESTIONS.length}`;
-            document.getElementById('progressFill').style.width = `${(currentStep / QUIZ_QUESTIONS.length) * 100}%`;
+            document.getElementById('stepCounter').textContent = 
+                `${currentStep + 1}/${activeQuestions.length}`;
+            document.getElementById('progressFill').style.width = 
+                `${(currentStep / activeQuestions.length) * 100}%`;
             
-            // Обновляем вопрос
-            document.getElementById('questionNumber').textContent = `Вопрос ${currentStep + 1}`;
+            document.getElementById('questionNumber').textContent = 
+                `Вопрос ${currentStep + 1}`;
             document.getElementById('questionTitle').textContent = q.text;
             document.getElementById('questionSub').textContent = q.subtitle || '';
             
-            // Рендерим варианты
             const container = document.getElementById('optionsList');
             container.innerHTML = q.options.map((opt, idx) => `
                 <div class="option" onclick="selectOption(${idx}, '${opt.value}')">
@@ -468,7 +407,6 @@
                 </div>
             `).join('');
             
-            // Перезапускаем анимацию
             const block = document.getElementById('questionBlock');
             block.style.animation = 'none';
             setTimeout(() => {
@@ -480,16 +418,24 @@
             if (selectedOption !== null) return;
             selectedOption = index;
             
-            // Визуальный отклик
             const options = document.querySelectorAll('.option');
             options[index].classList.add('selected');
             
             if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
             
-            // Сохраняем ответ
             answers.push(value);
             
-            // Переход к следующему вопросу
+            // 🎯 ОСОБАЯ ЛОГИКА: если это первый вопрос — определяем возраст
+            if (currentStep === 0) {
+                ageGroup = value;
+                // Загружаем вопросы для этой возрастной группы
+                activeQuestions = getQuestionsForAge(ageGroup);
+                
+                // Обновляем счётчик
+                document.getElementById('stepCounter').textContent = 
+                    `1/${activeQuestions.length}`;
+            }
+            
             setTimeout(() => {
                 currentStep++;
                 renderQuestion();
@@ -507,10 +453,11 @@
             const archetypeId = calculateArchetype(answers);
             const archetype = ARCHETYPES[archetypeId];
             
-            // Сохраняем в localStorage
+            // Сохраняем
             localStorage.setItem('archetype', archetypeId);
+            localStorage.setItem('ageGroup', ageGroup);
             
-            // Начисляем баллы (однократно)
+            // Начисляем баллы
             if (!localStorage.getItem('quizCompleted')) {
                 let balance = parseInt(localStorage.getItem('balance') || '0');
                 balance += 50;
@@ -518,18 +465,21 @@
                 localStorage.setItem('quizCompleted', 'true');
             }
             
-            // Отображаем результат
+            // Отображаем
             document.getElementById('resultEmoji').textContent = archetype.emoji;
             document.getElementById('resultTitle').textContent = archetype.name;
             document.getElementById('resultTitle').style.color = archetype.color;
-            document.getElementById('resultDesc').textContent = archetype.description;
+            
+            // 🎯 ОПИСАНИЕ ПО ВОЗРАСТУ
+            const desc = archetype.descByAge?.[ageGroup] || archetype.description || '';
+            document.getElementById('resultDesc').textContent = desc;
             
             // Сильные стороны
             document.getElementById('resultStrengths').innerHTML = archetype.strengths
                 .map(s => `<span class="strength-tag">✨ ${s}</span>`)
                 .join('');
             
-            // Рекомендуемые курсы
+            // Курсы
             const coursesContainer = document.getElementById('recommendedCourses');
             coursesContainer.innerHTML = archetype.recommendedCourses
                 .map(courseId => {
@@ -556,7 +506,6 @@
         // ========== ДЕЙСТВИЯ ==========
         function openCourse(courseId) {
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
-            // Пока просто алерт, потом сделаем страницу курса
             const course = COURSES[courseId];
             alert(`📚 ${course.name}\n\n${course.description}\n\n⏱ ${course.duration}\n👶 ${course.age}\n💰 ${course.price} ₽`);
         }
@@ -568,29 +517,35 @@
                 tg.sendData(JSON.stringify({
                     action: 'book_trial',
                     archetype: localStorage.getItem('archetype'),
+                    ageGroup: ageGroup,
                     timestamp: Date.now()
                 }));
             }
             
-            alert('✅ Заявка отправлена!\n\nАдминистратор свяжется с вами для записи на пробное занятие.');
+            alert('✅ Заявка отправлена!\n\nАдминистратор свяжется с вами.');
         }
         
         function restartQuiz() {
             currentStep = 0;
             answers = [];
             showingResult = false;
+            ageGroup = null;
             
             document.getElementById('questionBlock').classList.remove('hidden');
             document.getElementById('resultScreen').classList.remove('active');
             document.getElementById('progressFill').style.width = '0%';
             
+            // Возвращаемся к общим вопросам (только возраст)
+            activeQuestions = QUIZ_QUESTIONS.filter(q => q.section === 'common');
             renderQuestion();
         }
         
         // ========== ИНИЦИАЛИЗАЦИЯ ==========
+        // Начинаем только с вопроса о возрасте
+        activeQuestions = QUIZ_QUESTIONS.filter(q => q.section === 'common');
         renderQuestion();
         
-        console.log('🎯 Квест запущен');
+        console.log('🎯 Квест с адаптацией по возрасту загружен');
     </script>
 </body>
 </html>
