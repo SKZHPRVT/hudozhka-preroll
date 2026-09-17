@@ -103,7 +103,6 @@
             opacity: 0.9;
         }
         
-        /* Стрик */
         .streak-badge {
             display: inline-flex;
             align-items: center;
@@ -129,17 +128,17 @@
             50% { transform: scale(1.05); }
         }
         
-        /* ========== БЛОК ТЕМЫ ДНЯ ========== */
+        /* ========== СЕКЦИИ ========== */
         .section {
             padding: 16px 20px;
         }
         
+        /* ========== НОВАЯ КАРТОЧКА ТЕМЫ ДНЯ ========== */
         .theme-card {
-            background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
+            background: white;
             border: 2px dashed var(--pink);
             border-radius: 24px;
             padding: 20px;
-            text-align: center;
             margin-bottom: 16px;
             position: relative;
             overflow: hidden;
@@ -150,24 +149,54 @@
             background: linear-gradient(135deg, #F0FFF5, #E5FFE5);
         }
         
-        .theme-label {
-            font-size: 12px;
-            color: var(--pink);
+        /* Плашка месяца */
+        .theme-month {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
             font-weight: 700;
+            color: var(--purple);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 1.5px;
+            padding: 5px 12px;
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 12px;
+            margin-bottom: 14px;
+        }
+        
+        .theme-card.done .theme-month {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--green);
+        }
+        
+        /* Метка "Тема дня" */
+        .theme-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--pink);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
         }
         
         .theme-card.done .theme-label {
             color: var(--green);
         }
         
+        /* Главный блок: эмодзи + тема */
+        .theme-main {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+        
         .theme-emoji {
-            font-size: 56px;
-            margin-bottom: 8px;
+            font-size: 64px;
+            flex-shrink: 0;
             animation: float 3s ease-in-out infinite;
-            display: inline-block;
+            line-height: 1;
         }
         
         @keyframes float {
@@ -175,18 +204,65 @@
             50% { transform: translateY(-6px); }
         }
         
+        .theme-info {
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+        
         .theme-name {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             margin-bottom: 4px;
+            line-height: 1.2;
+            color: var(--text);
         }
         
         .theme-hint {
             font-size: 13px;
             color: var(--hint);
-            margin-bottom: 16px;
+            line-height: 1.4;
         }
         
+        /* Блок стиля дня */
+        .theme-style {
+            background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
+            border: 2px solid var(--pink);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+        
+        .style-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--pink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .style-value {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .style-emoji {
+            font-size: 24px;
+            line-height: 1;
+        }
+        
+        .style-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text);
+        }
+        
+        /* Кнопка начала */
         .theme-btn {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
@@ -210,7 +286,7 @@
             box-shadow: 0 4px 12px rgba(76,175,80,0.3);
         }
         
-        /* ========== БЛОК КВЕСТА ========== */
+        /* ========== КВЕСТ ========== */
         .quest-card {
             background: linear-gradient(135deg, #4ECDC4, #2ECC71);
             color: white;
@@ -254,7 +330,7 @@
             opacity: 0.9;
         }
         
-        /* ========== ДОСТИЖЕНИЯ ========== */
+        /* ========== ЗАГОЛОВКИ СЕКЦИЙ ========== */
         .section-title {
             font-size: 18px;
             font-weight: 800;
@@ -278,6 +354,93 @@
             text-decoration: none;
         }
         
+        /* ========== СТАТИСТИКА ========== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .stat {
+            background: white;
+            border-radius: 16px;
+            padding: 14px 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--purple);
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: var(--hint);
+            margin-top: 2px;
+        }
+        
+        /* ========== МИНИ-ГАЛЕРЕЯ ========== */
+        .mini-gallery {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin: 0 -20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .mini-gallery::-webkit-scrollbar { display: none; }
+        
+        .mini-drawing {
+            min-width: 90px;
+            height: 90px;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+            flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s;
+        }
+        
+        .mini-drawing:active { transform: scale(0.95); }
+        
+        .mini-drawing img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .mini-drawing-grade {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(76,175,80,0.9);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        
+        .mini-empty {
+            min-width: 100%;
+            padding: 24px;
+            text-align: center;
+            color: var(--hint);
+            font-size: 13px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        /* ========== ДОСТИЖЕНИЯ ========== */
         .achievements {
             display: flex;
             gap: 10px;
@@ -289,9 +452,7 @@
             -webkit-overflow-scrolling: touch;
         }
         
-        .achievements::-webkit-scrollbar {
-            display: none;
-        }
+        .achievements::-webkit-scrollbar { display: none; }
         
         .achievement {
             min-width: 90px;
@@ -329,96 +490,6 @@
             line-height: 1.2;
         }
         
-        /* ========== СТАТИСТИКА ========== */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        
-        .stat {
-            background: white;
-            border-radius: 16px;
-            padding: 14px 8px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        
-        .stat-value {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--purple);
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            color: var(--hint);
-            margin-top: 2px;
-        }
-        
-        /* ========== МИНИ-ПРЕВЬЮ РИСУНКОВ ========== */
-        .mini-gallery {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            margin: 0 -20px;
-            padding-left: 20px;
-            padding-right: 20px;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .mini-gallery::-webkit-scrollbar {
-            display: none;
-        }
-        
-        .mini-drawing {
-            min-width: 90px;
-            height: 90px;
-            border-radius: 14px;
-            background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            overflow: hidden;
-            flex-shrink: 0;
-            cursor: pointer;
-            position: relative;
-            transition: transform 0.2s;
-        }
-        
-        .mini-drawing:active {
-            transform: scale(0.95);
-        }
-        
-        .mini-drawing img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .mini-drawing-grade {
-            position: absolute;
-            top: 4px;
-            right: 4px;
-            background: rgba(76,175,80,0.9);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: 700;
-        }
-        
-        .mini-empty {
-            min-width: 100%;
-            padding: 24px;
-            text-align: center;
-            color: var(--hint);
-            font-size: 13px;
-            background: white;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        
         /* ========== НИЖНЯЯ НАВИГАЦИЯ ========== */
         .bottom-nav {
             position: fixed;
@@ -448,9 +519,7 @@
             transition: all 0.2s;
         }
         
-        .nav-item.active {
-            color: var(--pink);
-        }
+        .nav-item.active { color: var(--pink); }
         
         .nav-icon {
             font-size: 24px;
@@ -472,9 +541,7 @@
             padding: 20px;
         }
         
-        .modal.open {
-            display: flex;
-        }
+        .modal.open { display: flex; }
         
         .modal-content {
             background: white;
@@ -546,9 +613,7 @@
             cursor: pointer;
         }
         
-        .modal-btn:active {
-            transform: scale(0.97);
-        }
+        .modal-btn:active { transform: scale(0.97); }
     </style>
 </head>
 <body>
@@ -572,10 +637,29 @@
     <!-- ТЕМА ДНЯ -->
     <div class="section">
         <div class="theme-card" id="themeCard">
-            <div class="theme-label" id="themeLabel">📅 Тема дня</div>
-            <div class="theme-emoji" id="themeEmoji">🎨</div>
-            <div class="theme-name" id="themeName">Загрузка...</div>
-            <div class="theme-hint" id="themeHint"></div>
+            <div class="theme-month" id="themeMonth">
+                <span id="themeMonthEmoji">🍂</span>
+                <span id="themeMonthName">Осень</span>
+            </div>
+            
+            <div class="theme-label" id="themeLabel">📅 ТЕМА ДНЯ</div>
+            
+            <div class="theme-main">
+                <div class="theme-emoji" id="themeEmoji">🌸</div>
+                <div class="theme-info">
+                    <div class="theme-name" id="themeName">Астры</div>
+                    <div class="theme-hint" id="themeHint">Осенние цветы</div>
+                </div>
+            </div>
+            
+            <div class="theme-style" id="themeStyle">
+                <div class="style-label">🎨 Стиль дня</div>
+                <div class="style-value">
+                    <span class="style-emoji" id="styleEmoji">✏️</span>
+                    <span class="style-text" id="styleText">карандашом</span>
+                </div>
+            </div>
+            
             <button class="theme-btn" id="themeBtn" onclick="startDrawing()">
                 ✏️ Начать рисовать
             </button>
@@ -682,7 +766,6 @@
     
     <!-- ЛОГИКА -->
     <script>
-        // ========== TELEGRAM ==========
         let tg = window.Telegram?.WebApp;
         if (tg) {
             tg.ready();
@@ -698,16 +781,35 @@
             const drawings = Storage.getDrawings();
             const today = new Date().toDateString();
             
-            // Проверяем, рисовали ли сегодня
             const drewToday = drawings.some(d => {
                 const dDate = new Date(d.date).toDateString();
                 return dDate === today;
             });
             
-            document.getElementById('themeEmoji').textContent = todayTheme.emoji;
-            document.getElementById('themeName').textContent = todayTheme.text;
-            document.getElementById('themeHint').textContent = todayTheme.hint;
+            // Месяц
+            document.getElementById('themeMonthEmoji').textContent = todayTheme.monthEmoji || '📅';
+            document.getElementById('themeMonthName').textContent = todayTheme.monthName || 'Месяц';
             
+            // Тема дня
+            document.getElementById('themeEmoji').textContent = todayTheme.emoji;
+            document.getElementById('themeName').textContent = todayTheme.baseText || todayTheme.text;
+            
+            // Подсказка (без модификатора)
+            const baseHint = todayTheme.hint || 'Рисуй с удовольствием!';
+            const cleanHint = baseHint.split('.')[0]; // Первая часть до точки
+            document.getElementById('themeHint').textContent = cleanHint;
+            
+            // Стиль дня
+            const styleBox = document.getElementById('themeStyle');
+            if (todayTheme.modifierText) {
+                styleBox.style.display = 'flex';
+                document.getElementById('styleEmoji').textContent = todayTheme.modifierEmoji || '🎨';
+                document.getElementById('styleText').textContent = todayTheme.modifierText;
+            } else {
+                styleBox.style.display = 'none';
+            }
+            
+            // Кнопка и метка
             const card = document.getElementById('themeCard');
             const btn = document.getElementById('themeBtn');
             const label = document.getElementById('themeLabel');
@@ -721,13 +823,13 @@
                         startDrawing();
                     }
                 };
-                label.textContent = '✅ Выполнено сегодня';
+                label.textContent = '✅ ВЫПОЛНЕНО СЕГОДНЯ';
             } else {
                 card.classList.remove('done');
                 btn.classList.remove('done');
                 btn.textContent = '✏️ Начать рисовать';
                 btn.onclick = startDrawing;
-                label.textContent = '📅 Тема дня';
+                label.textContent = '📅 ТЕМА ДНЯ';
             }
         }
         
@@ -742,7 +844,6 @@
             document.getElementById('streakCount').textContent = streak;
             document.getElementById('streakValue').textContent = streak;
             
-            // Стрик бейдж
             const streakBadge = document.getElementById('streakBadge');
             if (streak > 0) {
                 streakBadge.classList.add('active');
@@ -775,7 +876,7 @@
             document.getElementById('balanceModal').classList.remove('open');
         }
         
-        // ========== МИНИ-ГАЛЕРЕЯ РИСУНКОВ ==========
+        // ========== МИНИ-ГАЛЕРЕЯ ==========
         function renderMiniGallery() {
             const container = document.getElementById('miniGallery');
             const drawings = Storage.getDrawings();
@@ -790,7 +891,6 @@
                 return;
             }
             
-            // Последние 6 рисунков
             const recent = drawings.slice(-6).reverse();
             
             container.innerHTML = recent.map(d => `
@@ -887,15 +987,12 @@
         
         init();
         
-        // Обновляем при возврате на страницу
         window.addEventListener('pageshow', init);
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) init();
         });
         
-        console.log('🎨 Рисовашка запущена');
-        console.log('📊 Баланс:', Storage.getBalance());
-        console.log('🖼 Рисунков:', Storage.getDrawings().length);
+        console.log('🎨 Рисовашка: тема и стиль разделены');
     </script>
 </body>
 </html>

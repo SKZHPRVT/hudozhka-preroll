@@ -1,6 +1,5 @@
-// ========== СИСТЕМА ХРАНЕНИЯ РИСУНКОВ ==========
+// ========== СИСТЕМА ХРАНЕНИЯ ==========
 const Storage = {
-    // Ключи
     KEYS: {
         BALANCE: 'balance',
         DRAWINGS: 'drawings',
@@ -11,12 +10,10 @@ const Storage = {
         QUIZ_DONE: 'quizCompleted'
     },
     
-    // ========== БАЗОВЫЕ МЕТОДЫ ==========
     get(key, defaultValue = null) {
         try {
             const val = localStorage.getItem(key);
             if (val === null) return defaultValue;
-            // Пробуем распарсить как JSON
             try {
                 return JSON.parse(val);
             } catch {
@@ -35,7 +32,6 @@ const Storage = {
             } else {
                 localStorage.setItem(key, String(value));
             }
-            // Синхронизируем в облако Telegram
             this.syncToCloud(key, value);
             return true;
         } catch (e) {
@@ -44,7 +40,7 @@ const Storage = {
         }
     },
     
-    // ========== РИСУНКИ ==========
+    // ========== РИСУНКИ (обновлено!) ==========
     saveDrawing(drawingData) {
         const drawings = this.get(this.KEYS.DRAWINGS, []);
         
@@ -52,17 +48,18 @@ const Storage = {
             id: Date.now(),
             theme: drawingData.theme,
             themeEmoji: drawingData.themeEmoji || '🎨',
+            modifier: drawingData.modifier || '',
+            modifierEmoji: drawingData.modifierEmoji || '',
+            monthName: drawingData.monthName || '',
             date: new Date().toISOString(),
             dateFormatted: new Date().toLocaleDateString('ru-RU'),
-            image: drawingData.image, // base64
+            image: drawingData.image,
             teacherGrade: null,
             teacherComment: null,
             submitted: false
         };
         
         drawings.push(drawing);
-        
-        // Храним только последние 50 рисунков (чтобы не переполнить localStorage)
         const trimmed = drawings.slice(-50);
         this.set(this.KEYS.DRAWINGS, trimmed);
         
@@ -125,15 +122,12 @@ const Storage = {
         let streak = this.getStreak();
         
         if (lastDraw === today) {
-            // Уже рисовали сегодня — стрик не растёт
             return streak;
         }
         
         if (lastDraw === yesterday.toDateString()) {
-            // Рисовали вчера — стрик растёт
             streak++;
         } else {
-            // Пропустили день — начинаем заново
             streak = 1;
         }
         
@@ -149,18 +143,17 @@ const Storage = {
         
         const tg = window.Telegram?.WebApp;
         
-        // Отправляем данные в чат-бот
         if (tg) {
             try {
                 tg.sendData(JSON.stringify({
                     action: 'submit_drawing',
                     drawingId: drawing.id,
                     theme: drawing.theme,
+                    modifier: drawing.modifier,
                     date: drawing.dateFormatted,
                     imageSize: drawing.image.length
                 }));
                 
-                // Помечаем как отправленный
                 this.updateDrawing(drawingId, { 
                     submitted: true,
                     submittedAt: new Date().toISOString()
@@ -176,7 +169,7 @@ const Storage = {
         return false;
     },
     
-    // ========== СИНХРОНИЗАЦИЯ С ОБЛАКОМ TELEGRAM ==========
+    // ========== СИНХРОНИЗАЦИЯ С ОБЛАКОМ ==========
     syncToCloud(key, value) {
         const tg = window.Telegram?.WebApp;
         if (!tg || !tg.CloudStorage) return;
@@ -184,10 +177,7 @@ const Storage = {
         try {
             const valueStr = typeof value === 'object' ? JSON.stringify(value) : String(value);
             
-            // Ограничение CloudStorage — 4096 байт на ключ
-            // Для больших данных (рисунков) сохраняем только метаданные
             if (valueStr.length > 4000) {
-                console.log('Data too large for cloud storage:', key);
                 return;
             }
             
@@ -199,7 +189,6 @@ const Storage = {
         }
     },
     
-    // Загрузка из облака при старте
     async loadFromCloud() {
         const tg = window.Telegram?.WebApp;
         if (!tg || !tg.CloudStorage) return;
@@ -213,14 +202,12 @@ const Storage = {
                     return;
                 }
                 
-                // Синхронизируем только если локально пусто
                 keys.forEach(key => {
                     const localVal = localStorage.getItem(key);
                     const cloudVal = values[key];
                     
                     if (!localVal && cloudVal) {
                         try {
-                            // Пробуем распарсить
                             try {
                                 JSON.parse(cloudVal);
                                 localStorage.setItem(key, cloudVal);
@@ -239,10 +226,8 @@ const Storage = {
     }
 };
 
-// Автозагрузка из облака
 if (typeof window !== 'undefined') {
     window.Storage = Storage;
-    // Загружаем данные при старте
     if (window.Telegram?.WebApp?.CloudStorage) {
         Storage.loadFromCloud();
     }

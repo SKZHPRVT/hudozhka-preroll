@@ -30,13 +30,14 @@
             touch-action: none;
         }
         
+        /* ========== ШАПКА (обновлённая) ========== */
         .top-bar {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
             padding: 10px 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             flex-shrink: 0;
         }
         
@@ -55,18 +56,36 @@
             flex-shrink: 0;
         }
         
-        .top-bar-info { flex: 1; min-width: 0; }
+        .top-bar-info {
+            flex: 1;
+            min-width: 0;
+            line-height: 1.25;
+        }
         
-        .theme-label { font-size: 10px; opacity: 0.85; margin-bottom: 2px; }
+        .theme-label {
+            font-size: 9px;
+            opacity: 0.8;
+            margin-bottom: 1px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
         
-        .theme-text {
-            font-size: 13px;
+        .theme-title {
+            font-size: 14px;
             font-weight: 700;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
         
+        .theme-style-label {
+            font-size: 11px;
+            opacity: 0.95;
+            margin-top: 1px;
+            font-style: italic;
+        }
+        
+        /* ========== ХОЛСТ ========== */
         .canvas-wrapper {
             flex: 1;
             display: flex;
@@ -109,6 +128,7 @@
         
         .hint-bubble.show { opacity: 1; }
         
+        /* ========== ИНСТРУМЕНТЫ ========== */
         .tools {
             background: white;
             border-top: 1px solid #eee;
@@ -298,6 +318,7 @@
             box-shadow: 0 4px 12px rgba(255,107,157,0.3);
         }
         
+        /* ========== МОДАЛКИ ========== */
         .modal {
             display: none;
             position: fixed;
@@ -355,6 +376,45 @@
             line-height: 1.5;
         }
         
+        /* Разделяемый блок темы в модалке */
+        .modal-theme-block {
+            background: #FFF5F8;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        
+        .modal-theme-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+        }
+        
+        .modal-theme-row:not(:last-child) {
+            border-bottom: 1px dashed #FFE5F0;
+        }
+        
+        .modal-theme-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--pink);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 60px;
+        }
+        
+        .modal-theme-value {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
         .points-earned {
             background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
             border-radius: 16px;
@@ -405,6 +465,7 @@
             cursor: pointer;
         }
         
+        /* ========== МОДАЛКА СОХРАНЕНИЯ ========== */
         .save-modal {
             display: none;
             position: fixed;
@@ -508,8 +569,9 @@
     <div class="top-bar">
         <button class="back-btn" onclick="goBack()">←</button>
         <div class="top-bar-info">
-            <div class="theme-label">📅 Тема дня</div>
-            <div class="theme-text" id="themeText">Загрузка...</div>
+            <div class="theme-label">📅 Сегодня рисуем</div>
+            <div class="theme-title" id="themeText">Загрузка...</div>
+            <div class="theme-style-label" id="styleLabel"></div>
         </div>
         <button class="icon-btn" onclick="showHint()">💡</button>
     </div>
@@ -539,11 +601,24 @@
         </div>
     </div>
     
+    <!-- МОДАЛКА ФИНАЛА -->
     <div class="modal" id="successModal">
         <div class="modal-content">
             <div class="modal-emoji">🎉</div>
             <div class="modal-title">Отличный рисунок!</div>
-            <div class="modal-sub" id="modalSub">Ты нарисовал(а) рисунок дня</div>
+            
+            <!-- Разделение темы и стиля -->
+            <div class="modal-theme-block">
+                <div class="modal-theme-row">
+                    <span class="modal-theme-label">Тема</span>
+                    <span class="modal-theme-value" id="modalThemeValue">🌸 Астры</span>
+                </div>
+                <div class="modal-theme-row" id="modalStyleRow">
+                    <span class="modal-theme-label">Стиль</span>
+                    <span class="modal-theme-value" id="modalStyleValue">🎨 карандашом</span>
+                </div>
+            </div>
+            
             <div class="points-earned">
                 <div class="points-value">+10</div>
                 <div class="points-label">баллов</div>
@@ -561,6 +636,7 @@
         </div>
     </div>
     
+    <!-- МОДАЛКА СОХРАНЕНИЯ -->
     <div class="save-modal" id="saveModal">
         <div class="save-modal-content">
             <div class="save-title">💾 Сохранить рисунок</div>
@@ -607,15 +683,27 @@
             }
         }
         
+        // ========== ТЕМА И СТИЛЬ ДНЯ ==========
         const todayTheme = getTodayTheme();
-        document.getElementById('themeText').textContent = todayTheme.emoji + ' ' + todayTheme.text;
+        
+        // Отображаем тему и стиль раздельно
+        document.getElementById('themeText').textContent = 
+            todayTheme.emoji + ' ' + (todayTheme.baseText || todayTheme.text);
+        
+        if (todayTheme.modifierText) {
+            document.getElementById('styleLabel').textContent = 
+                '🎨 ' + todayTheme.modifierText;
+        } else {
+            document.getElementById('styleLabel').textContent = '';
+        }
         
         function showHint() {
             const bubble = document.getElementById('hintBubble');
-            bubble.textContent = '💡 ' + todayTheme.hint;
+            const hint = todayTheme.hint || 'Рисуй с удовольствием!';
+            bubble.textContent = '💡 ' + hint;
             bubble.classList.add('show');
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
-            setTimeout(() => bubble.classList.remove('show'), 3000);
+            setTimeout(() => bubble.classList.remove('show'), 4000);
         }
         
         // ========== КИСТИ ==========
@@ -996,7 +1084,6 @@
             }
         }
         
-        // 💫 БЛЁСТКИ — мелкие точки вокруг с лёгким свечением
         function drawGlitter(pos, size) {
             const count = 8 + Math.floor(Math.random() * 8);
             const radius = size * 1.2;
@@ -1008,7 +1095,6 @@
                 const y = pos.y + Math.sin(angle) * dist;
                 const dotSize = size * (0.08 + Math.random() * 0.15);
                 
-                // Цветные блёстки
                 ctx.fillStyle = currentColor;
                 ctx.globalAlpha = 0.6 + Math.random() * 0.4;
                 ctx.shadowBlur = 4;
@@ -1018,7 +1104,6 @@
                 ctx.arc(x, y, dotSize, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Иногда — белые блёстки-искорки
                 if (Math.random() > 0.7) {
                     ctx.fillStyle = 'white';
                     ctx.globalAlpha = 0.9;
@@ -1034,7 +1119,6 @@
             ctx.globalAlpha = currentBrush.opacity;
         }
         
-        // 🎇 САЛЮТИК — точки разлетаются в стороны
         function drawSalut(pos, size) {
             const particles = 10 + Math.floor(Math.random() * 6);
             const radius = size * 1.8;
@@ -1049,12 +1133,10 @@
                 ctx.fillStyle = currentColor;
                 ctx.globalAlpha = 0.7 + Math.random() * 0.3;
                 
-                // Частица-точка
                 ctx.beginPath();
                 ctx.arc(x, y, particleSize, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Хвостик-лучик от центра
                 ctx.strokeStyle = currentColor;
                 ctx.globalAlpha = 0.4;
                 ctx.lineWidth = 1.5;
@@ -1067,19 +1149,16 @@
             ctx.globalAlpha = currentBrush.opacity;
         }
         
-        // 🌟 ПЫЛЬ — точки, оседающие вниз (звёздная пыль)
         function drawDust(pos, size) {
             const count = 4 + Math.floor(Math.random() * 4);
             
             for (let i = 0; i < count; i++) {
                 const offsetX = (Math.random() - 0.5) * size * 2;
-                // Смещение вниз — эффект оседания
                 const offsetY = Math.random() * size * 2;
                 const x = pos.x + offsetX;
                 const y = pos.y + offsetY;
                 const dotSize = size * (0.1 + Math.random() * 0.2);
                 
-                // Лёгкая дорожка от частицы
                 ctx.strokeStyle = currentColor;
                 ctx.globalAlpha = 0.3;
                 ctx.lineWidth = dotSize * 0.8;
@@ -1088,14 +1167,12 @@
                 ctx.lineTo(x, y);
                 ctx.stroke();
                 
-                // Точка
                 ctx.fillStyle = currentColor;
                 ctx.globalAlpha = 0.6 + Math.random() * 0.4;
                 ctx.beginPath();
                 ctx.arc(x, y, dotSize, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Блеск
                 if (Math.random() > 0.8) {
                     ctx.fillStyle = 'white';
                     ctx.globalAlpha = 0.8;
@@ -1188,7 +1265,6 @@
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
         }
         
-        // ========== ОЧИСТКА ==========
         function clearCanvas() {
             if (!confirm('Очистить рисунок?')) return;
             
@@ -1348,8 +1424,10 @@
             try {
                 tg.sendData(JSON.stringify({
                     action: 'save_image',
-                    theme: todayTheme.text,
+                    theme: todayTheme.baseText || todayTheme.text,
                     themeEmoji: todayTheme.emoji,
+                    modifier: todayTheme.modifierText || '',
+                    modifierEmoji: todayTheme.modifierEmoji || '',
                     image: dataURL,
                     timestamp: Date.now()
                 }));
@@ -1405,15 +1483,20 @@
             }
         }
         
+        // ========== ЗАВЕРШЕНИЕ РИСУНКА ==========
         function finishDrawing() {
             const imageData = canvas.toDataURL('image/png');
             
             Storage.addBalance(10);
             const streak = Storage.updateStreak();
             
+            // Сохраняем с разделением темы и стиля
             const drawing = Storage.saveDrawing({
-                theme: todayTheme.text,
+                theme: todayTheme.baseText || todayTheme.text,
                 themeEmoji: todayTheme.emoji,
+                modifier: todayTheme.modifierText || '',
+                modifierEmoji: todayTheme.modifierEmoji || '',
+                monthName: todayTheme.monthName || '',
                 image: imageData
             });
             
@@ -1422,8 +1505,18 @@
                 if (tg?.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
             }
             
-            document.getElementById('modalSub').textContent =
-                `Ты нарисовал(а) «${todayTheme.text}»`;
+            // Заполняем модалку
+            document.getElementById('modalThemeValue').textContent = 
+                `${todayTheme.emoji} ${todayTheme.baseText || todayTheme.text}`;
+            
+            const styleRow = document.getElementById('modalStyleRow');
+            if (todayTheme.modifierText) {
+                styleRow.style.display = 'flex';
+                document.getElementById('modalStyleValue').textContent = 
+                    `${todayTheme.modifierEmoji || '🎨'} ${todayTheme.modifierText}`;
+            } else {
+                styleRow.style.display = 'none';
+            }
             
             document.getElementById('successModal').classList.add('open');
             document.getElementById('successModal').dataset.drawingId = drawing.id;
@@ -1457,7 +1550,8 @@
         
         setTimeout(() => showHint(), 1500);
         
-        console.log('🎨 16 кистей: 3 новые искристые!');
+        console.log('🎨 Тема:', todayTheme.baseText);
+        console.log('🎨 Стиль:', todayTheme.modifierText || '(без стиля)');
     </script>
 </body>
 </html>
