@@ -133,7 +133,7 @@
             padding: 16px 20px;
         }
         
-        /* ========== НОВАЯ КАРТОЧКА ТЕМЫ ДНЯ ========== */
+        /* ========== КАРТОЧКА ТЕМЫ ДНЯ ========== */
         .theme-card {
             background: white;
             border: 2px dashed var(--pink);
@@ -231,10 +231,10 @@
             border-radius: 16px;
             padding: 12px 14px;
             margin-bottom: 16px;
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 4px 12px;
             align-items: center;
-            justify-content: space-between;
-            gap: 12px;
         }
         
         .style-label {
@@ -260,6 +260,17 @@
             font-size: 16px;
             font-weight: 700;
             color: var(--text);
+        }
+        
+        .style-hint {
+            font-size: 11px;
+            color: var(--hint);
+            margin-top: 4px;
+            font-style: italic;
+            text-align: right;
+            grid-column: 1 / -1;
+            padding-top: 6px;
+            border-top: 1px dashed rgba(255, 107, 157, 0.3);
         }
         
         /* Кнопка начала */
@@ -658,6 +669,7 @@
                     <span class="style-emoji" id="styleEmoji">✏️</span>
                     <span class="style-text" id="styleText">карандашом</span>
                 </div>
+                <div class="style-hint" id="styleHint">Точность линий</div>
             </div>
             
             <button class="theme-btn" id="themeBtn" onclick="startDrawing()">
@@ -788,23 +800,20 @@
             
             // Месяц
             document.getElementById('themeMonthEmoji').textContent = todayTheme.monthEmoji || '📅';
-            document.getElementById('themeMonthName').textContent = todayTheme.monthName || 'Месяц';
+            document.getElementById('themeMonthName').textContent = todayTheme.monthName || '';
             
-            // Тема дня
+            // Тема
             document.getElementById('themeEmoji').textContent = todayTheme.emoji;
-            document.getElementById('themeName').textContent = todayTheme.baseText || todayTheme.text;
+            document.getElementById('themeName').textContent = todayTheme.baseText;
+            document.getElementById('themeHint').textContent = todayTheme.themeHint || '';
             
-            // Подсказка (без модификатора)
-            const baseHint = todayTheme.hint || 'Рисуй с удовольствием!';
-            const cleanHint = baseHint.split('.')[0]; // Первая часть до точки
-            document.getElementById('themeHint').textContent = cleanHint;
-            
-            // Стиль дня
+            // Стиль
             const styleBox = document.getElementById('themeStyle');
             if (todayTheme.modifierText) {
-                styleBox.style.display = 'flex';
+                styleBox.style.display = 'grid';
                 document.getElementById('styleEmoji').textContent = todayTheme.modifierEmoji || '🎨';
                 document.getElementById('styleText').textContent = todayTheme.modifierText;
+                document.getElementById('styleHint').textContent = todayTheme.modifierHint || '';
             } else {
                 styleBox.style.display = 'none';
             }
@@ -992,7 +1001,7 @@
             if (!document.hidden) init();
         });
         
-        console.log('🎨 Рисовашка: тема и стиль разделены');
+        console.log('🎨 Рисовашка: раздельные подсказки темы и стиля');
     </script>
 </body>
 </html>

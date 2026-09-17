@@ -74,14 +74,9 @@
             font-size: 10px;
             font-weight: 700;
         }
-        .drawing-badge.graded {
-            background: var(--green);
-        }
-        .drawing-badge.submitted {
-            background: #2196F3;
-        }
+        .drawing-badge.graded { background: var(--green); }
+        .drawing-badge.submitted { background: #2196F3; }
         
-        /* Информация о рисунке */
         .drawing-info {
             padding: 10px 12px;
         }
@@ -142,7 +137,7 @@
             font-size: 20px;
             cursor: pointer;
         }
-        .viewer-title { font-size: 18px; font-weight: 700; }
+        .viewer-title { font-size: 18px; font-weight: 700; flex: 1; }
         .viewer-canvas-wrap {
             display: flex;
             align-items: center;
@@ -151,7 +146,7 @@
         }
         .viewer-canvas-wrap img {
             max-width: 100%;
-            max-height: 50vh;
+            max-height: 45vh;
             border-radius: 16px;
             background: white;
         }
@@ -161,7 +156,7 @@
             padding: 20px;
         }
         
-        /* Разделённая информация: тема и стиль */
+        /* Разделённая информация */
         .viewer-theme-block {
             background: linear-gradient(135deg, #FFF5F8, #FFE5F0);
             border-radius: 14px;
@@ -170,9 +165,9 @@
         }
         .viewer-theme-row {
             display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 0;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
         }
         .viewer-theme-row:not(:last-child) {
             border-bottom: 1px dashed #FFD0E0;
@@ -183,16 +178,21 @@
             color: var(--pink);
             text-transform: uppercase;
             letter-spacing: 1px;
-            min-width: 60px;
+            min-width: 55px;
+            padding-top: 3px;
         }
         .viewer-theme-value {
             flex: 1;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 700;
             color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        }
+        .viewer-theme-hint {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--hint);
+            margin-top: 4px;
+            font-style: italic;
         }
         
         .viewer-info { font-size: 13px; color: var(--hint); margin-bottom: 12px; }
@@ -206,11 +206,7 @@
             border-radius: 12px;
             margin-bottom: 12px;
         }
-        .grade-value {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--green);
-        }
+        .grade-value { font-size: 32px; font-weight: 800; color: var(--green); }
         .grade-label { font-size: 12px; color: var(--hint); }
         
         .teacher-comment {
@@ -243,17 +239,9 @@
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
         }
-        .viewer-btn-danger {
-            background: #FFE5E5;
-            color: #FF4444;
-        }
-        .viewer-btn-secondary {
-            background: #F0F0F0;
-            color: var(--text);
-        }
-        .viewer-btn-secondary[disabled] {
-            opacity: 0.5;
-        }
+        .viewer-btn-danger { background: #FFE5E5; color: #FF4444; }
+        .viewer-btn-secondary { background: #F0F0F0; color: var(--text); }
+        .viewer-btn-secondary[disabled] { opacity: 0.5; }
         
         .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; padding: 8px 0 20px; z-index: 100; }
         .nav-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; color: var(--hint); text-decoration: none; font-size: 11px; }
@@ -329,13 +317,11 @@
         let tg = window.Telegram?.WebApp;
         if (tg) { tg.ready(); tg.expand(); tg.setHeaderColor('#FF6B9D'); }
         
-        // Имя
         const user = tg?.initDataUnsafe?.user;
         if (user) {
             document.getElementById('userName').textContent = user.first_name || 'Художник';
         }
         
-        // Данные
         const balance = Storage.getBalance();
         const drawings = Storage.getDrawings();
         const streak = Storage.getStreak();
@@ -350,11 +336,12 @@
             document.getElementById('userArchetype').textContent = `${arch.emoji} ${arch.name}`;
         }
         
-        // ========== РИСУНКИ (обновлённое отображение) ==========
+        // ========== РИСУНКИ ==========
         function renderDrawings() {
             const grid = document.getElementById('drawingsGrid');
+            const currentDrawings = Storage.getDrawings();
             
-            if (drawings.length === 0) {
+            if (currentDrawings.length === 0) {
                 grid.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
                         <div class="empty-emoji">🎨</div>
@@ -365,7 +352,7 @@
                 return;
             }
             
-            grid.innerHTML = drawings.slice().reverse().map(d => {
+            grid.innerHTML = currentDrawings.slice().reverse().map(d => {
                 let badge = '';
                 let badgeClass = '';
                 
@@ -377,7 +364,6 @@
                     badgeClass = 'submitted';
                 }
                 
-                // Разделяем тему и стиль
                 const themeDisplay = `${d.themeEmoji || '🎨'} ${d.theme}`;
                 const styleDisplay = d.modifier 
                     ? `${d.modifierEmoji || '🎨'} ${d.modifier}`
@@ -410,29 +396,31 @@
                 `${drawing.themeEmoji || '🎨'} ${drawing.theme}`;
             document.getElementById('viewerImage').src = drawing.image;
             
-            // Нижняя часть — с разделением темы и стиля
+            // Разделение темы и стиля
             let bottomHTML = `
                 <div class="viewer-theme-block">
                     <div class="viewer-theme-row">
                         <span class="viewer-theme-label">Тема</span>
-                        <span class="viewer-theme-value">
+                        <div class="viewer-theme-value">
                             ${drawing.themeEmoji || '🎨'} ${drawing.theme}
-                        </span>
+                            ${drawing.themeHint ? `<div class="viewer-theme-hint">${drawing.themeHint}</div>` : ''}
+                        </div>
                     </div>
                     ${drawing.modifier ? `
                         <div class="viewer-theme-row">
                             <span class="viewer-theme-label">Стиль</span>
-                            <span class="viewer-theme-value">
+                            <div class="viewer-theme-value">
                                 ${drawing.modifierEmoji || '🎨'} ${drawing.modifier}
-                            </span>
+                                ${drawing.modifierHint ? `<div class="viewer-theme-hint">${drawing.modifierHint}</div>` : ''}
+                            </div>
                         </div>
                     ` : ''}
                     ${drawing.monthName ? `
                         <div class="viewer-theme-row">
                             <span class="viewer-theme-label">Месяц</span>
-                            <span class="viewer-theme-value">
+                            <div class="viewer-theme-value">
                                 📅 ${drawing.monthName}
-                            </span>
+                            </div>
                         </div>
                     ` : ''}
                 </div>

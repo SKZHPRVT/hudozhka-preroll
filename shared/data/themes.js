@@ -331,7 +331,7 @@ const MONTHLY_THEMES = {
             { text: 'Птицы на юг', emoji: '🕊', hint: 'Улетают' },
             { text: 'Мокрый асфальт', emoji: '🌧', hint: 'Отражения' },
             { text: 'Осенние цветы', emoji: '🌺', hint: 'Последние' },
-            { text: 'Астры', emoji: '💜', hint: 'Осенние' },
+            { text: 'Астры', emoji: '💜', hint: 'Осенние цветы' },
             { text: 'Хризантемы', emoji: '🌼', hint: 'Пышные' },
             { text: 'Яблоня в саду', emoji: '🍎', hint: 'Плоды' },
             { text: 'Урожай на столе', emoji: '🥕', hint: 'Дары осени' },
@@ -453,7 +453,7 @@ const MONTHLY_THEMES = {
     }
 };
 
-// ========== МОДИФИКАТОРЫ (обновляются каждый месяц) ==========
+// ========== МОДИФИКАТОРЫ (свои для каждого месяца) ==========
 const MONTHLY_MODIFIERS = {
     0: [ // Январь
         { text: 'акварелью', emoji: '💧', hint: 'Мягкие переходы' },
@@ -593,7 +593,7 @@ function wasUsedRecently(usedMap, key) {
     return lastUsed > oneYearAgo;
 }
 
-// ========== ФИНАЛЬНАЯ ТЕМА ДНЯ ==========
+// ========== ФИНАЛЬНАЯ ТЕМА ДНЯ (с разделёнными подсказками) ==========
 function getTodayTheme() {
     const today = new Date();
     const month = today.getMonth();
@@ -647,26 +647,39 @@ function getTodayTheme() {
     
     const baseTheme = monthData.themes[themeIndex];
     
+    // ⚡ РАЗДЕЛЁННЫЕ ДАННЫЕ:
     const result = {
         id: themeIndex,
         monthId: month,
         modifierId: modifierIndex,
+        
+        // Склейка (для обратной совместимости)
         text: `${baseTheme.text} ${modifier.text}`,
-        baseText: baseTheme.text,
-        modifierText: modifier.text,
-        emoji: baseTheme.emoji,
-        modifierEmoji: modifier.emoji,
         hint: `${baseTheme.hint}. ${modifier.hint}`,
-        monthName: monthData.name,
-        monthEmoji: monthData.emoji,
+        
+        // ⚡ РАЗДЕЛЬНЫЕ ПОЛЯ:
+        // Тема
+        baseText: baseTheme.text,           // "Астры"
+        themeHint: baseTheme.hint,          // "Осенние цветы"
+        emoji: baseTheme.emoji,             // 🌸
+        
+        // Стиль
+        modifierText: modifier.text,        // "карандашом"
+        modifierHint: modifier.hint,        // "Точность линий"
+        modifierEmoji: modifier.emoji,      // ✏️
+        
+        // Месяц
+        monthName: monthData.name,          // "Осень"
+        monthEmoji: monthData.emoji,        // 🍂
+        
         date: dateKey
     };
     
     localStorage.setItem(cacheKey, JSON.stringify(result));
     cleanOldCaches();
     
-    console.log('🎨 Тема дня:', result.text);
-    console.log('📅 Месяц:', monthData.name);
+    console.log('🎨 Тема:', result.baseText, '—', result.themeHint);
+    console.log('🎨 Стиль:', result.modifierText, '—', result.modifierHint);
     
     return result;
 }
@@ -690,6 +703,7 @@ function cleanOldCaches() {
     }
 }
 
+// ========== СТАТИСТИКА ==========
 function getThemesStats() {
     const today = new Date();
     const month = today.getMonth();

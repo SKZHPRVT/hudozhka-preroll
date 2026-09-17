@@ -30,7 +30,7 @@
             touch-action: none;
         }
         
-        /* ========== ШАПКА (обновлённая) ========== */
+        /* ========== ШАПКА ========== */
         .top-bar {
             background: linear-gradient(135deg, #FF6B9D, #9B59B6);
             color: white;
@@ -113,17 +113,19 @@
             top: 16px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.85);
             color: white;
-            padding: 8px 14px;
-            border-radius: 10px;
+            padding: 10px 16px;
+            border-radius: 12px;
             font-size: 12px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s;
             z-index: 5;
             max-width: 90%;
-            text-align: center;
+            text-align: left;
+            line-height: 1.5;
+            white-space: pre-line;
         }
         
         .hint-bubble.show { opacity: 1; }
@@ -369,14 +371,7 @@
             margin-bottom: 8px;
         }
         
-        .modal-sub {
-            font-size: 14px;
-            color: var(--hint);
-            margin-bottom: 20px;
-            line-height: 1.5;
-        }
-        
-        /* Разделяемый блок темы в модалке */
+        /* Блок темы/стиля в модалке */
         .modal-theme-block {
             background: #FFF5F8;
             border-radius: 16px;
@@ -387,9 +382,9 @@
         
         .modal-theme-row {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
-            padding: 6px 0;
+            padding: 8px 0;
         }
         
         .modal-theme-row:not(:last-child) {
@@ -402,7 +397,8 @@
             color: var(--pink);
             text-transform: uppercase;
             letter-spacing: 1px;
-            min-width: 60px;
+            min-width: 55px;
+            padding-top: 2px;
         }
         
         .modal-theme-value {
@@ -410,9 +406,20 @@
             font-size: 14px;
             font-weight: 700;
             color: var(--text);
+        }
+        
+        .modal-theme-value-main {
             display: flex;
             align-items: center;
             gap: 6px;
+        }
+        
+        .modal-theme-value-hint {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--hint);
+            margin-top: 3px;
+            font-style: italic;
         }
         
         .points-earned {
@@ -607,15 +614,20 @@
             <div class="modal-emoji">🎉</div>
             <div class="modal-title">Отличный рисунок!</div>
             
-            <!-- Разделение темы и стиля -->
             <div class="modal-theme-block">
                 <div class="modal-theme-row">
                     <span class="modal-theme-label">Тема</span>
-                    <span class="modal-theme-value" id="modalThemeValue">🌸 Астры</span>
+                    <div class="modal-theme-value">
+                        <div class="modal-theme-value-main" id="modalThemeMain">🌸 Астры</div>
+                        <div class="modal-theme-value-hint" id="modalThemeHint">Осенние цветы</div>
+                    </div>
                 </div>
                 <div class="modal-theme-row" id="modalStyleRow">
                     <span class="modal-theme-label">Стиль</span>
-                    <span class="modal-theme-value" id="modalStyleValue">🎨 карандашом</span>
+                    <div class="modal-theme-value">
+                        <div class="modal-theme-value-main" id="modalStyleMain">✏️ карандашом</div>
+                        <div class="modal-theme-value-hint" id="modalStyleHint">Точность линий</div>
+                    </div>
                 </div>
             </div>
             
@@ -686,9 +698,9 @@
         // ========== ТЕМА И СТИЛЬ ДНЯ ==========
         const todayTheme = getTodayTheme();
         
-        // Отображаем тему и стиль раздельно
+        // Заголовок
         document.getElementById('themeText').textContent = 
-            todayTheme.emoji + ' ' + (todayTheme.baseText || todayTheme.text);
+            todayTheme.emoji + ' ' + todayTheme.baseText;
         
         if (todayTheme.modifierText) {
             document.getElementById('styleLabel').textContent = 
@@ -697,11 +709,22 @@
             document.getElementById('styleLabel').textContent = '';
         }
         
+        // Подсказка — комбинированная с разделением
         function showHint() {
             const bubble = document.getElementById('hintBubble');
-            const hint = todayTheme.hint || 'Рисуй с удовольствием!';
-            bubble.textContent = '💡 ' + hint;
+            let hintText = '';
+            
+            if (todayTheme.themeHint) {
+                hintText += '📝 ' + todayTheme.themeHint;
+            }
+            if (todayTheme.modifierHint) {
+                if (hintText) hintText += '\n';
+                hintText += '🎨 ' + todayTheme.modifierHint;
+            }
+            
+            bubble.textContent = hintText || 'Рисуй с удовольствием!';
             bubble.classList.add('show');
+            
             if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
             setTimeout(() => bubble.classList.remove('show'), 4000);
         }
@@ -1424,7 +1447,7 @@
             try {
                 tg.sendData(JSON.stringify({
                     action: 'save_image',
-                    theme: todayTheme.baseText || todayTheme.text,
+                    theme: todayTheme.baseText,
                     themeEmoji: todayTheme.emoji,
                     modifier: todayTheme.modifierText || '',
                     modifierEmoji: todayTheme.modifierEmoji || '',
@@ -1483,16 +1506,15 @@
             }
         }
         
-        // ========== ЗАВЕРШЕНИЕ РИСУНКА ==========
+        // ========== ЗАВЕРШЕНИЕ ==========
         function finishDrawing() {
             const imageData = canvas.toDataURL('image/png');
             
             Storage.addBalance(10);
             const streak = Storage.updateStreak();
             
-            // Сохраняем с разделением темы и стиля
             const drawing = Storage.saveDrawing({
-                theme: todayTheme.baseText || todayTheme.text,
+                theme: todayTheme.baseText,
                 themeEmoji: todayTheme.emoji,
                 modifier: todayTheme.modifierText || '',
                 modifierEmoji: todayTheme.modifierEmoji || '',
@@ -1506,14 +1528,18 @@
             }
             
             // Заполняем модалку
-            document.getElementById('modalThemeValue').textContent = 
-                `${todayTheme.emoji} ${todayTheme.baseText || todayTheme.text}`;
+            document.getElementById('modalThemeMain').textContent = 
+                `${todayTheme.emoji} ${todayTheme.baseText}`;
+            document.getElementById('modalThemeHint').textContent = 
+                todayTheme.themeHint || '';
             
             const styleRow = document.getElementById('modalStyleRow');
             if (todayTheme.modifierText) {
                 styleRow.style.display = 'flex';
-                document.getElementById('modalStyleValue').textContent = 
+                document.getElementById('modalStyleMain').textContent = 
                     `${todayTheme.modifierEmoji || '🎨'} ${todayTheme.modifierText}`;
+                document.getElementById('modalStyleHint').textContent = 
+                    todayTheme.modifierHint || '';
             } else {
                 styleRow.style.display = 'none';
             }
@@ -1550,8 +1576,8 @@
         
         setTimeout(() => showHint(), 1500);
         
-        console.log('🎨 Тема:', todayTheme.baseText);
-        console.log('🎨 Стиль:', todayTheme.modifierText || '(без стиля)');
+        console.log('🎨 Тема:', todayTheme.baseText, '—', todayTheme.themeHint);
+        console.log('🎨 Стиль:', todayTheme.modifierText, '—', todayTheme.modifierHint);
     </script>
 </body>
 </html>
